@@ -453,6 +453,7 @@ class FormFile
 		// Get list of files
 		$file_list = null;
 		if (!empty($filedir)) {
+			//TODO GREGM name Fiohier sur card
 			$file_list = dol_dir_list($filedir, 'files', 0, '', '(\.meta|_preview.*.*\.png)$', 'date', SORT_DESC);
 		}
 		if ($hideifempty && empty($file_list)) {
@@ -570,6 +571,7 @@ class FormFile
 				if (is_array($genallowed)) {
 					$modellist = $genallowed;
 				} else {
+					var_dump("PIZANDNIK");
 					include_once DOL_DOCUMENT_ROOT.'/core/modules/contract/modules_contract.php';
 					$modellist = ModelePDFContract::liste_modeles($this->db);
 				}
@@ -591,6 +593,8 @@ class FormFile
 				if (is_array($genallowed)) {
 					$modellist = $genallowed;
 				} else {
+					//TODO product
+
 					include_once DOL_DOCUMENT_ROOT.'/core/modules/product/modules_product.class.php';
 					$modellist = ModelePDFProduct::liste_modeles($this->db);
 				}
@@ -772,7 +776,7 @@ class FormFile
 				}
 				$out .= $form->textwithpicto('', $tooltipontemplatecombo, 1, 'help', 'marginrightonly', 0, 3, '', 0);
 			} else {
-				$out .= '<div class="float">'.$langs->trans("Files").'</div>';
+				$out .= '<div class="float">'.$langs->trans("Files").'</div>'; //TODO GREGM
 			}
 
 			// Language code (if multilang)
@@ -866,7 +870,7 @@ class FormFile
 						$file_list = dol_sort_array($file_list, $sortfield, $sortorder);
 					}
 				}
-
+				//TODO Foreach file gregm-------------------------------------------------------------------------------
 				foreach ($file_list as $file) {
 					// Define relative path for download link (depends on module)
 					$relativepath = $file["name"]; // Cas general
@@ -908,6 +912,7 @@ class FormFile
 					$out .= '<td class="nowrap right">'.dol_print_date($date, 'dayhour', 'tzuser').'</td>';
 
 					// Show share link
+					//TODO GREGM LINK
 					$out .= '<td class="nowraponall">';
 					if (!empty($file['share'])) {
 						// Define $urlwithroot
@@ -945,6 +950,7 @@ class FormFile
 							//$out.= '&modulepart='.$modulepart; // TODO obsolete ?
 							//$out.= '&urlsource='.urlencode($urlsource); // TODO obsolete ?
 							$out .= '">'.img_picto($langs->trans("Delete"), 'delete').'</a>';
+							//$out .= img_picto($langs->trans("Delete"), 'delete').'</a>'; // TODO fichiers Corbeille
 						}
 						if ($printer) {
 							$out .= '<a class="marginleftonly reposition" href="'.$urlsource.(strpos($urlsource, '?') ? '&' : '?').'action=print_file&token='.newToken().'&printer='.urlencode($modulepart).'&file='.urlencode($relativepath);
@@ -976,19 +982,45 @@ class FormFile
 			if (is_array($link_list)) {
 				$colspan = 2;
 
+
+				//TODO For LINK -------------------------------------------------------------------------------------
+
+
 				foreach ($link_list as $file) {
 					$out .= '<tr class="oddeven">';
 					$out .= '<td colspan="'.$colspan.'" class="maxwidhtonsmartphone">';
 					$out .= '<a data-ajax="false" href="'.$file->url.'" target="_blank" rel="noopener noreferrer">';
 					$out .= $file->label;
-					$out .= '</a>';
+					//$out .= '</a>';
 					$out .= '</td>';
 					$out .= '<td class="right">';
 					$out .= dol_print_date($file->datea, 'dayhour');
+					//TEST GREGM
+					//$out .= img_picto($langs->trans("Delete"), 'delete').'</a>';
 					$out .= '</td>';
-					if ($delallowed || $printer || $morepicto) {
-						$out .= '<td></td>';
+					$out .= '<td></td>';
+					$out .= '<td class="right nowraponall">';
+					$out .= '</a>';
+
+					if ($delallowed) {
+						$tmpurllinksource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
+						$out .= '<a class="reposition" href="' . $tmpurllinksource . ((strpos($tmpurllinksource, '?') === false) ? '?' : '&') . 'action=' . urlencode($removeaction) . '&token=' . newToken() . '&file=' . urlencode($relativepath);
+						$out .= ($param ? '&' . $param : '');
+						//$out.= '&modulepart='.$modulepart; // TODO obsolete ?
+						//$out.= '&urlsource='.urlencode($urlsource); // TODO obsolete ?
+						$out .= '">' . img_picto($langs->trans("Delete"), 'delete') . '</a>';
+						//$out .= img_picto($langs->trans("Delete"), 'delete') . '</a>'; // TODO fichiers Corbeille
 					}
+					if ($printer) {
+						$out .= '<a class="marginleftonly reposition" href="' . $urlsource . (strpos($urlsource, '?') ? '&' : '?') . 'action=print_file&token=' . newToken() . '&printer=' . urlencode($modulepart) . '&file=' . urlencode($relativepath);
+						$out .= ($param ? '&' . $param : '');
+						$out .= '">' . img_picto($langs->trans("PrintFile", $relativepath), 'printer.png') . '</a>';
+					}
+					if ($morepicto) {
+						$morepicto = preg_replace('/__FILENAMEURLENCODED__/', urlencode($relativepath), $morepicto);
+						$out .= $morepicto;
+					}
+					$out .= '</td>';
 					$out .= '</tr>'."\n";
 				}
 				$this->numoffiles++;
