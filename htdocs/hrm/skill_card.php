@@ -101,9 +101,8 @@ if (empty($reshook)) {
 	$error = 0;
 
 	$backurlforlist = DOL_URL_ROOT.'/hrm/skill_list.php';
-
-	if (empty($backtopage) || ($cancel && empty($id))) {
-		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
+	if (!empty($backtopage) || ($cancel && empty($id))) {
+		if (!empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) {
 				$backtopage = $backurlforlist;
 			} else {
@@ -111,7 +110,6 @@ if (empty($reshook)) {
 			}
 		}
 	}
-
 	$triggermodname = 'hrm_SKILL_MODIFY'; // Name of trigger action code to execute when we modify record
 
 
@@ -214,7 +212,7 @@ if ($action == 'create') {
 	print dol_get_fiche_end();
 
 	print '<div class="center">';
-	print '<input type="submit" class="button" name="add" value="' . dol_escape_htmltag($langs->trans("Create")) . '">';
+	print '<input type="submit" class="button" name="add" value="' . dol_escape_htmltag($langs->trans("CreaAAAAAAAAte")) . '">';
 	print '&nbsp; ';
 
 	print '<input type="' . ($backtopage ? "submit" : "button") . '" class="button button-cancel" name="cancel" value="' . dol_escape_htmltag($langs->trans("Cancel")) . '"' . ($backtopage ? '' : ' onclick="javascript:history.go(-1)"') . '>'; // Cancel for create does not post form if we don't know the backtopage
