@@ -82,3 +82,6 @@ SkillComparison=Skill comparison
 ActionsOnJob=Events on this job
 VacantPosition=job vacancy
 VacantCheckboxHelper=Checking this option will show unfilled positions (job vacancy)
+SaveAddSkill = Skill(s) added
+SaveLevelSkill = Skill(s) level saved
+DeleteSkill = Skill removed
