@@ -159,6 +159,7 @@ if (empty($reshook)) {
 				$line->rankorder = $TNote[$line->fk_skill];
 				$line->update($user);
 			}
+			setEventMessage($langs->trans("SaveLevelSkill"));
 		}
 	}
 
