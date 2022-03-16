@@ -100,34 +100,30 @@ function evaluationPrepareHead($object)
 function GetLegendSkills()
 {
 	global $langs;
-	ob_start();
-	?>
-	<div style="font-style:italic;">
-		<?php echo $langs->trans('legend'); ?>
+	$legendSkills = '<div style="font-style:italic;">
+		'. $langs->trans('legend').'
 		<table class="border" width="100%">
 			<tr>
 				<td><span style="vertical-align:middle" class="toohappy diffnote little"></span>
-					<?php echo $langs->trans('CompetenceAcquiredByOneOrMore'); ?></td>
+					'.$langs->trans('CompetenceAcquiredByOneOrMore').'</td>
 			</tr>
 			<tr>
 				<td><span style="vertical-align:middle" class="veryhappy diffnote little"></span>
-					<?php echo $langs->trans('MaxlevelGreaterThan'); ?></td>
+					'.$langs->trans('MaxlevelGreaterThan').'</td>
 			</tr>
 			<tr>
 				<td><span style="vertical-align:middle" class="happy diffnote little"></span>
-					<?php echo $langs->trans('MaxLevelEqualTo'); ?></td>
+					'.$langs->trans('MaxLevelEqualTo').'</td>
 			</tr>
 			<tr>
 				<td><span style="vertical-align:middle" class="sad diffnote little"></span>
-					<?php echo $langs->trans('MaxLevelLowerThan'); ?></td>
+					'.$langs->trans('MaxLevelLowerThan').'</td>
 			</tr>
 			<tr>
 				<td><span style="vertical-align:middle" class="toosad diffnote little"></span>
-					<?php echo $langs->trans('SkillNotAcquired'); ?></td>
+					'.$langs->trans('SkillNotAcquired').'</td>
 			</tr>
 		</table>
-
-	</div>
-	<?php
-	return ob_get_clean();
+	</div>';
+	return $legendSkills;
 }
