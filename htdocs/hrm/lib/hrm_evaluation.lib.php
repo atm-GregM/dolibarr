@@ -94,6 +94,9 @@ function evaluationPrepareHead($object)
 	return $head;
 }
 
+/**
+ * @return string
+ */
 function GetLegendSkills()
 {
 	global $langs;
