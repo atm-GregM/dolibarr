@@ -85,3 +85,6 @@ VacantCheckboxHelper=Checking this option will show unfilled positions (job vaca
 SaveAddSkill = Skill(s) added
 SaveLevelSkill = Skill(s) level saved
 DeleteSkill = Skill removed
+SkillsExtraFields=Attributs supplémentaires (compétences)
+JobsExtraFields=Attributs supplémentaires (emplois)
+EvaluationsExtraFields=Attributs supplémentaires (évaluations)
