@@ -103,7 +103,7 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'title_setup');
 
 $head = hrmAdminPrepareHead();
 
-print dol_get_fiche_head($head, 'job_extrafields', $langs->trans($page_name), -1, 'hrm@job');
+print dol_get_fiche_head($head, 'jobsAttributes', $langs->trans($page_name), -1, 'hrm@job');
 
 require DOL_DOCUMENT_ROOT.'/core/tpl/admin_extrafields_view.tpl.php';
 
