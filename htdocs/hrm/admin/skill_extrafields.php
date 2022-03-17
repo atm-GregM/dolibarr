@@ -58,7 +58,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once '../lib/hrm.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('hrm@skill', 'admin'));
+$langs->loadLangs(array('hrm', 'admin'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

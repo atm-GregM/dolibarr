@@ -58,7 +58,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once '../lib/hrm.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('hrm@hrm', 'admin'));
+$langs->loadLangs(array('hrm', 'admin'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);
@@ -72,7 +72,7 @@ foreach ($tmptype2label as $key => $val) {
 
 $action = GETPOST('action', 'aZ09');
 $attrname = GETPOST('attrname', 'alpha');
-$elementtype = 'hrm_hrm'; //Must be the $table_element of the class that manage extrafield
+$elementtype = 'hrm_evaluation'; //Must be the $table_element of the class that manage extrafield
 
 if (!$user->admin) {
 	accessforbidden();
