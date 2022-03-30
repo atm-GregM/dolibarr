@@ -7,3 +7,4 @@ dolibarr/htdocs/custom/ndfp/class/ndfp.class.php	|		=> Permet l'envoi par e-mail
 dolibarr/htdocs/compta/facture.php				    | l 3059	=> Ne pas autoriser l'ajout de ligne libre (mantis 32)
 dolibarr/htdocs/comm/propal.php					    | l 1648	=> Ne pas autoriser l'ajout de ligne libre (mantis 278)
 dolibarr/htdocs/core/modules/facture/mod_facture_mercure.php	| l 133		=> Préfixe devant la numérotation des acomptes (pour gestion prpre des règements)
+dolibarr/htdocs/core/tpl/objectline_create.tpl.php  | l 1005    => Permet de ne pas bloquer l'affichage des unités

@@ -1001,7 +1001,9 @@ if (!empty($usemargins) && $user->rights->margins->creer) {
         jQuery("#title_up_ht_currency").hide();
 		<?php } ?>
 		jQuery("#price_ttc, #fourn_ref, #tva_tx, #title_fourn_ref, #title_vat, #title_up_ttc, #title_up_ttc_currency").hide();
-		jQuery("#np_marginRate, #np_markRate, .np_marginRate, .np_markRate, #units, #title_units").hide();
+<!--DEBUT SPECIFIQUE CLIENT ARCOOP-->
+		jQuery("#np_marginRate, #np_markRate, .np_marginRate, .np_markRate").hide();
+<!--FIN SPECIFIQUE CLIENT ARCOOP-->
 		jQuery("#buying_price").show();
 		jQuery('#trlinefordates, .divlinefordates').show();
 	}
