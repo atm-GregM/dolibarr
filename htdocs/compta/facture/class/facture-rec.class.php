@@ -363,8 +363,8 @@ class FactureRec extends CommonInvoice
 						$facsrc->lines[$i]->label,
 						$facsrc->lines[$i]->fk_unit,
 						$facsrc->lines[$i]->multicurrency_subprice,
-						0,
-						0,
+						1,
+						1,
 						null,
 						$facsrc->lines[$i]->pa_ht
 					);
