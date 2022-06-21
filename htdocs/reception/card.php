@@ -210,6 +210,8 @@ if (empty($reshook)) {
 				$ret = $object->fetch($id); // Reload to get new records
 				$object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}
+		} else {
+			setEventMessages($object->error, $object->errors, 'errors');
 		}
 	}
 
@@ -267,10 +269,10 @@ if (empty($reshook)) {
 		$object->origin = $origin;
 		$object->origin_id = $origin_id;
 		$object->fk_project = GETPOST('projectid', 'int');
-		$object->weight = GETPOST('weight', 'int') == '' ? "NULL" : GETPOST('weight', 'int');
-		$object->sizeH = GETPOST('sizeH', 'int') == '' ? "NULL" : GETPOST('sizeH', 'int');
-		$object->sizeW = GETPOST('sizeW', 'int') == '' ? "NULL" : GETPOST('sizeW', 'int');
-		$object->sizeS = GETPOST('sizeS', 'int') == '' ? "NULL" : GETPOST('sizeS', 'int');
+		$object->weight = GETPOST('weight', 'int') == '' ? null : GETPOST('weight', 'int');
+		$object->sizeH = GETPOST('sizeH', 'int') == '' ? null : GETPOST('sizeH', 'int');
+		$object->sizeW = GETPOST('sizeW', 'int') == '' ? null : GETPOST('sizeW', 'int');
+		$object->sizeS = GETPOST('sizeS', 'int') == '' ? null : GETPOST('sizeS', 'int');
 		$object->size_units = GETPOST('size_units', 'int');
 		$object->weight_units = GETPOST('weight_units', 'int');
 
@@ -350,8 +352,10 @@ if (empty($reshook)) {
 				}
 				$qty = "qtyl".$i;
 				$comment = "comment".$i;
-				$eatby = "dlc".$i;
-				$sellby = "dluo".$i;
+				// EATBY <-> DLUO see productbatch.class.php
+				// SELLBY <-> DLC
+				$eatby = "dluo".$i;
+				$sellby = "dlc".$i;
 				$batch = "batch".$i;
 				$cost_price = "cost_price".$i;
 
@@ -626,9 +630,11 @@ if (empty($reshook)) {
 						$batch = "batch".$line_id;
 						$dlc = "dlc".$line_id;
 						$dluo = "dluo".$line_id;
-						$eatby = GETPOST($dlc, 'alpha');
+						// EATBY <-> DLUO
+						$eatby = GETPOST($dluo, 'alpha');
 						$eatbydate = str_replace('/', '-', $eatby);
-						$sellby = GETPOST($dluo, 'alpha');
+						// SELLBY <-> DLC
+						$sellby = GETPOST($dlc, 'alpha');
 						$sellbydate = str_replace('/', '-', $sellby);
 						$line->batch = GETPOST($batch, 'alpha');
 						$line->eatby = strtotime($eatbydate);
@@ -639,8 +645,7 @@ if (empty($reshook)) {
 						setEventMessages($line->error, $line->errors, 'errors');
 						$error++;
 					}
-				} else // Product no predefined
-				{
+				} else { // Product no predefined
 					$qty = "qtyl".$line_id;
 					$line->id = $line_id;
 					$line->qty = GETPOST($qty, 'int');
@@ -693,7 +698,7 @@ if (empty($reshook)) {
 	$triggersendname = 'RECEPTION_SENTBYMAIL';
 	$paramname = 'id';
 	$mode = 'emailfromreception';
-	$trackid = 'shi'.$object->id;
+	$trackid = 'rec'.$object->id;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
 
@@ -1940,15 +1945,16 @@ if ($action == 'create') {
 
 				// Warehouse source
 				if (!empty($conf->stock->enabled)) {
-					print '<td class="left">';
-
 					if ($lines[$i]->fk_entrepot > 0) {
 						$entrepot = new Entrepot($db);
 						$entrepot->fetch($lines[$i]->fk_entrepot);
-						print $entrepot->getNomUrl(1);
-					}
 
-					print '</td>';
+						print '<td class="left tdoverflowmax150" title="'.dol_escape_htmltag($entrepot->label).'">';
+						print $entrepot->getNomUrl(1);
+						print '</td>';
+					} else {
+						print '<td></td>';
+					}
 				}
 
 				// Batch number managment

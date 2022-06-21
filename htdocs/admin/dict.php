@@ -658,8 +658,8 @@ if ($id == 11) {
 
 	asort($elementList);
 	$sourceList = array(
-			'internal' => $langs->trans('Internal'),
-			'external' => $langs->trans('External')
+		'internal' => $langs->trans('Internal'),
+		'external' => $langs->trans('External')
 	);
 }
 
@@ -726,12 +726,12 @@ if (GETPOST('actionadd') || GETPOST('actionmodify')) {
 		}
 		if ((!GETPOSTISSET($value) || GETPOST($value) == '')
 			&& (!in_array($value, array('decalage', 'module', 'accountancy_code', 'accountancy_code_sell', 'accountancy_code_buy', 'tracking', 'picto'))  // Fields that are not mandatory
-			&& ($id != 10 || ($value != 'code' && $value != 'note')) // Field code and note is not mandatory for dictionary table 10
-			)
-		) {
-			$ok = 0;
-			$fieldnamekey = $value;
-			// We take translate key of field
+				&& ($id != 10 || ($value != 'code' && $value != 'note')) // Field code and note is not mandatory for dictionary table 10
+				)
+			) {
+				$ok = 0;
+				$fieldnamekey = $value;
+				// We take translate key of field
 			if ($fieldnamekey == 'libelle' || ($fieldnamekey == 'label')) {
 				$fieldnamekey = 'Label';
 			}
@@ -781,7 +781,7 @@ if (GETPOST('actionadd') || GETPOST('actionmodify')) {
 				$fieldnamekey = 'UseByDefault';
 			}
 
-			setEventMessages($langs->transnoentities("ErrorFieldRequired", $langs->transnoentities($fieldnamekey)), null, 'errors');
+				setEventMessages($langs->transnoentities("ErrorFieldRequired", $langs->transnoentities($fieldnamekey)), null, 'errors');
 		}
 	}
 	// Other checks
@@ -795,10 +795,10 @@ if (GETPOST('actionadd') || GETPOST('actionmodify')) {
 			setEventMessages($langs->transnoentities('ErrorCodeCantContainZero'), null, 'errors');
 		}
 		/*if (!is_numeric($_POST['code']))	// disabled, code may not be in numeric base
-		{
-			$ok = 0;
-			$msg .= $langs->transnoentities('ErrorFieldFormat', $langs->transnoentities('Code')).'<br>';
-		}*/
+		 {
+		 $ok = 0;
+		 $msg .= $langs->transnoentities('ErrorFieldFormat', $langs->transnoentities('Code')).'<br>';
+		 }*/
 	}
 	if (GETPOSTISSET("country") && (GETPOST("country") == '0') && ($id != 2)) {
 		if (in_array($tablib[$id], array('DictionaryCompanyType', 'DictionaryHolidayTypes'))) {	// Field country is no mandatory for such dictionaries
@@ -2344,10 +2344,10 @@ function fieldList($fieldlist, $obj = '', $tabname = '', $context = '')
 		} elseif ($value == 'unit') {
 			print '<td>';
 			$units = array(
-					'mm' => $langs->trans('SizeUnitmm'),
-					'cm' => $langs->trans('SizeUnitcm'),
-					'point' => $langs->trans('SizeUnitpoint'),
-					'inch' => $langs->trans('SizeUnitinch')
+				'mm' => $langs->trans('SizeUnitmm'),
+				'cm' => $langs->trans('SizeUnitcm'),
+				'point' => $langs->trans('SizeUnitpoint'),
+				'inch' => $langs->trans('SizeUnitinch')
 			);
 			print $form->selectarray('unit', $units, (!empty($obj->{$value}) ? $obj->{$value}:''), 0, 0, 0);
 			print '</td>';

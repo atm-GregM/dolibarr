@@ -6,7 +6,7 @@
  * Copyright (C) 2010-2021 Juanjo Menent        <jmenent@2byte.es>
  * Copyright (C) 2014      Cedric Gross         <c.gross@kreiz-it.fr>
  * Copyright (C) 2016      Florian Henry        <florian.henry@atm-consulting.fr>
- * Copyright (C) 2017-2020 Ferran Marcet        <fmarcet@2byte.es>
+ * Copyright (C) 2017-2022 Ferran Marcet        <fmarcet@2byte.es>
  * Copyright (C) 2018      Frédéric France      <frederic.france@netlogic.fr>
  * Copyright (C) 2019-2020 Christophe Battarel	<christophe@altairis.fr>
  *
@@ -337,7 +337,7 @@ if ($action == 'dispatch' && $permissiontoreceive) {
 				}
 
 				if (!$error) {
-					$result = $object->dispatchProduct($user, GETPOST($prod, 'int'), GETPOST($qty), GETPOST($ent, 'int'), GETPOST($pu), GETPOST('comment'), $dDLC, $dDLUO, GETPOST($lot, 'alpha'), GETPOST($fk_commandefourndet, 'int'), $notrigger);
+					$result = $object->dispatchProduct($user, GETPOST($prod, 'int'), GETPOST($qty), GETPOST($ent, 'int'), GETPOST($pu), GETPOST('comment'), $dDLUO, $dDLC, GETPOST($lot, 'alpha'), GETPOST($fk_commandefourndet, 'int'), $notrigger);
 					if ($result < 0) {
 						setEventMessages($object->error, $object->errors, 'errors');
 						$error++;
@@ -423,6 +423,7 @@ if ($action == 'confirm_deleteline' && $confirm == 'yes' && $permissiontoreceive
 			$mouv = new MouvementStock($db);
 			if ($product > 0) {
 				$mouv->origin = &$object;
+				$mouv->setOrigin($object->element, $object->id);
 				$result = $mouv->livraison($user, $product, $entrepot, $qty, $price, $comment, '', $eatby, $sellby, $batch);
 				if ($result < 0) {
 					$errors = $mouv->errors;
@@ -469,6 +470,7 @@ if ($action == 'updateline' && $permissiontoreceive) {
 			$mouv = new MouvementStock($db);
 			if ($product > 0) {
 				$mouv->origin = &$object;
+				$mouv->setOrigin($object->element, $object->id);
 				$result = $mouv->livraison($user, $product, $entrepot, $qty, $price, $comment, '', $eatby, $sellby, $batch);
 				if ($result < 0) {
 					$errors = $mouv->errors;

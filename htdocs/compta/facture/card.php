@@ -155,12 +155,11 @@ if (!empty($conf->global->INVOICE_USE_RETAINED_WARRANTY)) {
 }
 
 // Security check
-$fieldid = (!empty($ref) ? 'ref' : 'rowid');
 if ($user->socid) {
 	$socid = $user->socid;
 }
 $isdraft = (($object->statut == Facture::STATUS_DRAFT) ? 1 : 0);
-$result = restrictedArea($user, 'facture', $object->id, '', '', 'fk_soc', $fieldid, $isdraft);
+$result = restrictedArea($user, 'facture', $object->id, '', '', 'fk_soc', 'rowid', $isdraft);
 
 
 /*
@@ -606,40 +605,6 @@ if (empty($reshook)) {
 		$object->fetch($id);
 		$object->fetch_thirdparty();
 
-		// Check parameters
-
-		// Check for mandatory fields in thirdparty (defined into setup)
-		$array_to_check = array('IDPROF1', 'IDPROF2', 'IDPROF3', 'IDPROF4', 'IDPROF5', 'IDPROF6', 'EMAIL');
-		foreach ($array_to_check as $key) {
-			$keymin = strtolower($key);
-			$i = (int) preg_replace('/[^0-9]/', '', $key);
-			$vallabel = $object->thirdparty->$keymin;
-
-			if ($i > 0) {
-				if ($object->thirdparty->isACompany()) {
-					// Check for mandatory prof id (but only if country is other than ours)
-					if ($mysoc->country_id > 0 && $object->thirdparty->country_id == $mysoc->country_id) {
-						$idprof_mandatory = 'SOCIETE_'.$key.'_INVOICE_MANDATORY';
-						if (!$vallabel && !empty($conf->global->$idprof_mandatory)) {
-							$langs->load("errors");
-							$error++;
-							setEventMessages($langs->trans('ErrorProdIdIsMandatory', $langs->transcountry('ProfId'.$i, $object->thirdparty->country_code)).' ('.$langs->trans("ForbiddenBySetupRules").')', null, 'errors');
-						}
-					}
-				}
-			} else {
-				//var_dump($conf->global->SOCIETE_EMAIL_MANDATORY);
-				if ($key == 'EMAIL') {
-					// Check for mandatory
-					if (!empty($conf->global->SOCIETE_EMAIL_INVOICE_MANDATORY) && !isValidEMail($object->thirdparty->email)) {
-						$langs->load("errors");
-						$error++;
-						setEventMessages($langs->trans("ErrorBadEMail", $object->thirdparty->email).' ('.$langs->trans("ForbiddenBySetupRules").')', null, 'errors');
-					}
-				}
-			}
-		}
-
 		// Check for mandatory fields in invoice
 		$array_to_check = array('REF_CLIENT'=>'RefCustomer');
 		foreach ($array_to_check as $key => $val) {
@@ -734,7 +699,7 @@ if (empty($reshook)) {
 		}
 
 		if (!$error) {
-			// On verifie si la facture a des paiements
+			// We check if invoice has payments
 			$sql = 'SELECT pf.amount';
 			$sql .= ' FROM '.MAIN_DB_PREFIX.'paiement_facture as pf';
 			$sql .= ' WHERE pf.fk_facture = '.((int) $object->id);
@@ -984,7 +949,7 @@ if (empty($reshook)) {
 				$db->rollback();
 			}
 		}
-	} elseif ($action == 'confirm_delete_paiement' && $confirm == 'yes' && $usercancreate) {
+	} elseif ($action == 'confirm_delete_paiement' && $confirm == 'yes' && $usercanissuepayment) {
 		// Delete payment
 		$object->fetch($id);
 		if ($object->statut == Facture::STATUS_VALIDATED && $object->paye == 0) {
@@ -2388,9 +2353,9 @@ if (empty($reshook)) {
 		}
 
 		// Define special_code for special lines
-		$special_code = GETPOST('special_code');
-		if (!GETPOST('qty')) {
-			$special_code = 3;
+		$special_code = GETPOST('special_code', 'int');
+		if ($special_code == 3) {
+			$special_code = 0;	// Options should not exists on invoices
 		}
 
 		$line = new FactureLigne($db);
@@ -2916,6 +2881,9 @@ if ($action == 'create') {
 			if (empty($mode_reglement_id)) {
 				$mode_reglement_id = $soc->mode_reglement_id;
 			}
+			if (empty($fk_account)) {
+				$fk_account = $soc->fk_account;
+			}
 			if (!$remise_percent) {
 				$remise_percent = $soc->remise_percent;
 			}
@@ -3022,6 +2990,9 @@ if ($action == 'create') {
 	if (empty($mode_reglement_id)) {
 		$mode_reglement_id = GETPOST("mode_reglement_id", 'int');
 	}
+
+	// when bank account is empty (means not override by payment mode form a other object, like third-party), try to use default value
+	$fk_account = GETPOSTISSET("fk_account") ? GETPOST("fk_account", 'int') : $fk_account;
 
 	if (!empty($soc->id)) {
 		$absolute_discount = $soc->getAvailableDiscounts();
@@ -3203,7 +3174,7 @@ if ($action == 'create') {
 
 	// Standard invoice
 	print '<div class="tagtr listofinvoicetype"><div class="tagtd listofinvoicetype">';
-	$tmp = '<input type="radio" id="radio_standard" name="type" value="0"'.(GETPOST('type') == 0 ? ' checked' : '').'> ';
+	$tmp = '<input type="radio" id="radio_standard" name="type" value="0"'.(GETPOST('type', 'int') ? '' : ' checked').'> ';
 	$tmp  = $tmp.'<label for="radio_standard" >'.$langs->trans("InvoiceStandardAsk").'</label>';
 	$desc = $form->textwithpicto($tmp, $langs->transnoentities("InvoiceStandardDesc"), 1, 'help', '', 0, 3);
 	print '<table class="nobordernopadding"><tr>';
@@ -3625,8 +3596,8 @@ if ($action == 'create') {
 	// Bank Account
 	if (!empty($conf->banque->enabled)) {
 		print '<tr><td>'.$langs->trans('BankAccount').'</td><td colspan="2">';
-		$fk_account = GETPOSTISSET('fk_account') ? GETPOST('fk_account', 'int') : $fk_account;
-		print img_picto('', 'bank_account', 'class="pictofixedwidth"').$form->select_comptes(($fk_account < 0 ? '' : $fk_account), 'fk_account', 0, '', 1, '', 0, 'maxwidth200 widthcentpercentminusx', 1);
+		print img_picto('', 'bank_account', 'class="pictofixedwidth"');
+		print $form->select_comptes(($fk_account < 0 ? '' : $fk_account), 'fk_account', 0, '', 1, '', 0, 'maxwidth200 widthcentpercentminusx', 1);
 		print '</td></tr>';
 	}
 
@@ -4711,7 +4682,7 @@ if ($action == 'create') {
 	}
 	if (($mysoc->localtax2_assuj == "1" && $mysoc->useLocalTax(2)) || $object->total_localtax2 != 0) {	// Localtax2
 		print '<tr><td>'.$langs->transcountry("AmountLT2", $mysoc->country_code).'</td>';
-		print '<td class=nowrap amountcard">'.price($sign * $object->total_localtax2, 1, '', 1, - 1, - 1, $conf->currency).'</td></tr>';
+		print '<td class="nowrap amountcard">'.price($sign * $object->total_localtax2, 1, '', 1, - 1, - 1, $conf->currency).'</td></tr>';
 	}
 
 	// Revenue stamp
@@ -4799,6 +4770,7 @@ if ($action == 'create') {
 
 	// List of previous situation invoices
 	if (($object->situation_cycle_ref > 0) && !empty($conf->global->INVOICE_USE_SITUATION)) {
+		print '<!-- List of situation invoices -->';
 		print '<table class="noborder situationstable" width="100%">';
 
 		print '<tr class="liste_titre">';
@@ -4937,15 +4909,16 @@ if ($action == 'create') {
 
 	// List of payments already done
 
+	print '<!-- List of payments already done -->';
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder paymenttable centpercent">';
 
 	print '<tr class="liste_titre">';
 	print '<td class="liste_titre">'.($object->type == Facture::TYPE_CREDIT_NOTE ? $langs->trans("PaymentsBack") : $langs->trans('Payments')).'</td>';
-	print '<td class="liste_titre">'.$langs->trans('Date').'</td>';
-	print '<td class="liste_titre">'.$langs->trans('Type').'</td>';
+	print '<td class="liste_titre"><span class="hideonsmartphone">'.$langs->trans('Date').'</span></td>';
+	print '<td class="liste_titre"><span class="hideonsmartphone">'.$langs->trans('Type').'</span></td>';
 	if (!empty($conf->banque->enabled)) {
-		print '<td class="liste_titre">'.$langs->trans('BankAccount').'</td>';
+		print '<td class="liste_titre"><span class="hideonsmartphone">'.$langs->trans('BankAccount').'</span></td>';
 	}
 	print '<td class="liste_titre right">'.$langs->trans('Amount').'</td>';
 	print '<td class="liste_titre" width="18">&nbsp;</td>';

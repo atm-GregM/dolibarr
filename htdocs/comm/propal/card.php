@@ -116,7 +116,7 @@ $usercandelete = $user->rights->propal->supprimer;
 
 $usercanclose = ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && $usercancreate) || (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->propal->propal_advance->close)));
 $usercanvalidate = ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && $usercancreate) || (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->propal->propal_advance->validate)));
-$usercansend = (empty($conf->global->MAIN_USE_ADVANCED_PERMS) || $user->rights->propal->propal_advance->send);
+$usercansend = (empty($conf->global->MAIN_USE_ADVANCED_PERMS) || (!empty($conf->global->MAIN_USE_ADVANCED_PERMS) && !empty($user->rights->propal->propal_advance->send)));
 
 $usercancreateorder = $user->rights->commande->creer;
 $usercancreateinvoice = $user->rights->facture->creer;
@@ -246,8 +246,11 @@ if (empty($reshook)) {
 		// Remove line
 		$result = $object->deleteline($lineid);
 		// reorder lines
-		if ($result) {
+		if ($result > 0) {
 			$object->line_order(true);
+		} else {
+			$langs->load("errors");
+			setEventMessages($object->error, $object->errors, 'errors');
 		}
 
 		if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) {
@@ -835,7 +838,7 @@ if (empty($reshook)) {
 		$prod_entry_mode = GETPOST('prod_entry_mode');
 		if ($prod_entry_mode == 'free') {
 			$idprod = 0;
-			$tva_tx = (GETPOST('tva_tx') ? price2num(GETPOST('tva_tx')) : 0);
+			$tva_tx = (GETPOST('tva_tx') ? price2num(preg_replace('/\s*\(.*\)/', '', GETPOST('tva_tx'))) : 0);
 		} else {
 			$idprod = GETPOST('idprod', 'int');
 			$tva_tx = '';
@@ -1955,7 +1958,7 @@ if ($action == 'create') {
 
 		// We verify whether the object is provisionally numbering
 		$ref = substr($object->ref, 1, 4);
-		if ($ref == 'PROV') {
+		if ($ref == 'PROV' || $ref == '') {
 			$numref = $object->getNextNumRef($soc);
 			if (empty($numref)) {
 				$error++;

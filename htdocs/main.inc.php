@@ -89,7 +89,7 @@ function testSqlAndScriptInject($val, $type)
 	// Decode string first because a lot of things are obfuscated by encoding or multiple encoding.
 	// So <svg o&#110;load='console.log(&quot;123&quot;)' become <svg onload='console.log(&quot;123&quot;)'
 	// So "&colon;&apos;" become ":'" (due to ENT_HTML5)
-	// Loop to decode until no more thing to decode.
+	// Loop to decode until no more things to decode.
 	//print "before decoding $val\n";
 	do {
 		$oldval = $val;
@@ -97,16 +97,29 @@ function testSqlAndScriptInject($val, $type)
 		//$val = preg_replace_callback('/&#(x?[0-9][0-9a-f]+;?)/i', 'realCharForNumericEntities', $val); // Sometimes we have entities without the ; at end so html_entity_decode does not work but entities is still interpreted by browser.
 		$val = preg_replace_callback('/&#(x?[0-9][0-9a-f]+;?)/i', function ($m) {
 			return realCharForNumericEntities($m); }, $val);
+		// We clean html comments because some hacks try to obfuscate evil strings by inserting HTML comments. Example: on<!-- -->error=alert(1)
+		$val = preg_replace('/<!--[^>]*-->/', '', $val);
+		$val = preg_replace('/[\r\n]/', '', $val);
 	} while ($oldval != $val);
-	//print "after  decoding $val\n";
-
-	// We clean string because some hacks try to obfuscate evil strings by inserting non printable chars. Example: 'java(ascci09)scr(ascii00)ipt' is processed like 'javascript' (whatever is place of evil ascii char)
-	// We should use dol_string_nounprintableascii but function is not yet loaded/available
-	$val = preg_replace('/[\x00-\x1F\x7F]/u', '', $val); // /u operator makes UTF8 valid characters being ignored so are not included into the replace
-	// We clean html comments because some hacks try to obfuscate evil strings by inserting HTML comments. Example: on<!-- -->error=alert(1)
-	$val = preg_replace('/<!--[^>]*-->/', '', $val);
+	//print "type = ".$type." after decoding: ".$val."\n";
 
 	$inj = 0;
+
+	// We check string because some hacks try to obfuscate evil strings by inserting non printable chars. Example: 'java(ascci09)scr(ascii00)ipt' is processed like 'javascript' (whatever is place of evil ascii char)
+	// We should use dol_string_nounprintableascii but function is not yet loaded/available
+	// Example of valid UTF8 chars:
+	// utf8=utf8mb3:    '\x09', '\x0A', '\x0D', '\x7E'
+	// utf8=utf8mb3: 	'\xE0\xA0\x80'
+	// utf8mb4: 		'\xF0\x9D\x84\x9E'   (but this may be refused by the database insert if pagecode is utf8=utf8mb3)
+	$newval = preg_replace('/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/u', '', $val); // /u operator makes UTF8 valid characters being ignored so are not included into the replace
+
+	// Note that $newval may also be completely empty '' when non valid UTF8 are found.
+	if ($newval != $val) {
+		// If $val has changed after removing non valid UTF8 chars, it means we have an evil string.
+		$inj += 1;
+	}
+	//print 'type='.$type.'-val='.$val.'-newval='.$newval."-inj=".$inj."\n";
+
 	// For SQL Injection (only GET are used to scan for such injection strings)
 	if ($type == 1 || $type == 3) {
 		$inj += preg_match('/delete\s+from/i', $val);
@@ -166,7 +179,6 @@ function testSqlAndScriptInject($val, $type)
 
 	//$inj += preg_match('/on[A-Z][a-z]+\*=/', $val);   // To lock event handlers onAbort(), ...
 	$inj += preg_match('/&#58;|&#0000058|&#x3A/i', $val); // refused string ':' encoded (no reason to have it encoded) to lock 'javascript:...'
-
 	$inj += preg_match('/javascript\s*:/i', $val);
 	$inj += preg_match('/vbscript\s*:/i', $val);
 	// For XSS Injection done by adding javascript closing html tags like with onmousemove, etc... (closing a src or href tag with not cleaned param)
@@ -504,7 +516,7 @@ if ((!defined('NOCSRFCHECK') && empty($dolibarr_nocsrfcheck) && getDolGlobalInt(
 		// If token is not provided or empty, error (we are in case it is mandatory)
 		if (!GETPOST('token', 'alpha') || GETPOST('token', 'alpha') == 'notrequired') {
 			if (GETPOST('uploadform', 'int')) {
-				dol_syslog("--- Access to ".(empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"].' ').$_SERVER["PHP_SELF"]." refused. File size too large.");
+				dol_syslog("--- Access to ".(empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"].' ').$_SERVER["PHP_SELF"]." refused. File size too large or not provided.");
 				$langs->loadLangs(array("errors", "install"));
 				print $langs->trans("ErrorFileSizeTooLarge").' ';
 				print $langs->trans("ErrorGoBackAndCorrectParameters");
@@ -533,7 +545,10 @@ if ((!defined('NOCSRFCHECK') && empty($dolibarr_nocsrfcheck) && getDolGlobalInt(
 		dol_syslog("--- Access to ".(empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"].' ').$_SERVER["PHP_SELF"]." refused by CSRF protection (invalid token), so we disable POST and some GET parameters - referer=".$_SERVER['HTTP_REFERER'].", action=".GETPOST('action', 'aZ09').", _GET|POST['token']=".GETPOST('token', 'alpha').", _SESSION['token']=".$_SESSION['token'], LOG_WARNING);
 		//print 'Unset POST by CSRF protection in main.inc.php.';	// Do not output anything because this create problems when using the BACK button on browsers.
 		setEventMessages('SecurityTokenHasExpiredSoActionHasBeenCanceledPleaseRetry', null, 'warnings');
-		if (isset($_POST['id'])) $savid = ((int) $_POST['id']);
+		$savid = null;
+		if (isset($_POST['id'])) {
+			$savid = ((int) $_POST['id']);
+		}
 		unset($_POST);
 		//unset($_POST['action']); unset($_POST['massaction']);
 		//unset($_POST['confirm']); unset($_POST['confirmmassaction']);
@@ -541,7 +556,10 @@ if ((!defined('NOCSRFCHECK') && empty($dolibarr_nocsrfcheck) && getDolGlobalInt(
 		unset($_GET['action']);
 		unset($_GET['confirmmassaction']);
 		unset($_GET['massaction']);
-		if (isset($savid)) $_POST['id'] = ((int) $savid);
+		unset($_GET['token']);			// TODO Make a redirect if we have a token in url to remove it ?
+		if (isset($savid)) {
+			$_POST['id'] = ((int) $savid);
+		}
 	}
 
 	// Note: There is another CSRF protection into the filefunc.inc.php
@@ -1422,11 +1440,8 @@ function top_htmlhead($head, $title = '', $disablejs = 0, $disablehead = 0, $arr
 
 	print '<!doctype html>'."\n";
 
-	if (!empty($conf->global->MAIN_USE_CACHE_MANIFEST)) {
-		print '<html lang="'.substr($langs->defaultlang, 0, 2).'" manifest="'.DOL_URL_ROOT.'/cache.manifest">'."\n";
-	} else {
-		print '<html lang="'.substr($langs->defaultlang, 0, 2).'">'."\n";
-	}
+	print '<html lang="'.substr($langs->defaultlang, 0, 2).'">'."\n";
+
 	//print '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">'."\n";
 	if (empty($disablehead)) {
 		if (!is_object($hookmanager)) {
@@ -3213,6 +3228,7 @@ if (!function_exists("llxFooter")) {
 									id:<?php echo $object->id; ?>
 									, element:'<?php echo $object->element ?>'
 									, action:'DOC_PREVIEW'
+									, token: '<?php echo currentToken(); ?>'
 								}
 						);
 					});
@@ -3222,6 +3238,7 @@ if (!function_exists("llxFooter")) {
 									id:<?php echo $object->id; ?>
 									, element:'<?php echo $object->element ?>'
 									, action:'DOC_DOWNLOAD'
+									, token: '<?php echo currentToken(); ?>'
 								}
 						);
 					});
@@ -3270,6 +3287,7 @@ if (!function_exists("llxFooter")) {
 						?>
 							<script>
 							jQuery(document).ready(function (tmp) {
+								console.log("Try Ping with hash_unique_id is md5('dolibarr'+instance_unique_id)");
 								$.ajax({
 									  method: "POST",
 									  url: "<?php echo $url_for_ping ?>",

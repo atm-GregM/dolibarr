@@ -1,6 +1,4 @@
--- ===================================================================
--- Copyright (C) 2012	Laurent Destailleur	<eldy@users.sourceforge.net>
--- Copyright (C) 2016	Regis Houssin		<regis.houssin@inodbox.com>
+-- Copyright (C) 2020 florian HENRY florian.henry@scopen.fr
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -15,10 +13,15 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <https://www.gnu.org/licenses/>.
 --
--- ===================================================================
+--
 
-ALTER TABLE llx_partnership ADD INDEX idx_partnership_entity (entity);
-ALTER TABLE llx_partnership ADD UNIQUE INDEX uk_partnership_ref (ref, entity);
+--
+-- Do not place a comment at the end of the line, this file is parsed when
+-- from the install and all '--' are removed.
+--
+-- Ne pas placer de commentaire en fin de ligne, ce fichier est parsé lors
+-- de l'install et tous les sigles '--' sont supprimés.
+--
 
-ALTER TABLE llx_partnership ADD UNIQUE INDEX uk_fk_type_fk_soc (fk_type, fk_soc, date_partnership_start);
-ALTER TABLE llx_partnership ADD UNIQUE INDEX uk_fk_type_fk_member (fk_type, fk_member, date_partnership_start);
+INSERT INTO llx_c_partnership_type (code, label, active) VALUES ('DEFAULT', 'Default', 1);
+

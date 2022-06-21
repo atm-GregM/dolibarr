@@ -3,7 +3,7 @@
  * Copyright (C) 2014-2020  Laurent Destailleur     <eldy@users.sourceforge.net>
  * Copyright (C) 2015       Jean-François Ferry     <jfefe@aternatik.fr>
  * Copyright (C) 2015       Charlie BENKE           <charlie@patas-monkey.com>
- * Copyright (C) 2018-2021  Frédéric France         <frederic.france@netlogic.fr>
+ * Copyright (C) 2018-2022  Frédéric France         <frederic.france@netlogic.fr>
  * Copyright (C) 2021       Gauthier VERDOL         <gauthier.verdol@atm-consulting.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -270,7 +270,7 @@ if ($action == 'add' && empty($cancel)) {
 
 		$ret = $object->create($user);
 		if ($ret < 0) {
-			var_dump($ret);
+			setEventMessages($object->error, $object->errors, 'errors');
 			$error++;
 		}
 		if (!empty($auto_create_paiement) && !$error) {
@@ -554,7 +554,7 @@ if ($action == 'create') {
 	print '<tr><td>';
 	print $form->editfieldkey('Amount', 'amount', '', $object, 0, 'string', '', 1).'</td><td>';
 	print '<input name="amount" id="amount" class="minwidth75 maxwidth100" value="'.GETPOST("amount").'">&nbsp;';
-	print '<button class="dpInvisibleButtons" id="updateAmountWithLastSalary" name="_useless" type="button">'.$langs->trans('UpdateAmountWithLastSalary').'</a>';
+	print '<button class="dpInvisibleButtons datenow" id="updateAmountWithLastSalary" name="_useless" type="button">'.$langs->trans('UpdateAmountWithLastSalary').'</a>';
 	print '</td>';
 	print '</tr>';
 
@@ -699,6 +699,7 @@ if ($action == 'create') {
 
 if ($id) {
 	$head = salaries_prepare_head($object);
+	$formconfirm = ''; /**BACKPORT_FROM_16.0 **/
 
 	if ($action === 'clone') {
 		$formquestion = array(
@@ -708,24 +709,39 @@ if ($id) {
 		//$formquestion[] = array('type' => 'date', 'name' => 'clone_date_ech', 'label' => $langs->trans("Date"), 'value' => -1);
 		$formquestion[] = array('type' => 'date', 'name' => 'clone_date_start', 'label' => $langs->trans("DateStart"), 'value' => -1);
 		$formquestion[] = array('type' => 'date', 'name' => 'clone_date_end', 'label' => $langs->trans("DateEnd"), 'value' => -1);
-
-		print $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneSalary', $object->ref), 'confirm_clone', $formquestion, 'yes', 1, 240);
+		/**BACKPORT_FROM_16.0 **/
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneSalary', $object->ref), 'confirm_clone', $formquestion, 'yes', 1, 240);
+		/**END BACKPORT_FROM_16.0 **/
 	}
 
 	if ($action == 'paid') {
 		$text = $langs->trans('ConfirmPaySalary');
-		print $form->formconfirm($_SERVER["PHP_SELF"]."?id=".$object->id, $langs->trans('PaySalary'), $text, "confirm_paid", '', '', 2);
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"]."?id=".$object->id, $langs->trans('PaySalary'), $text, "confirm_paid", '', '', 2);
 	}
 
 	if ($action == 'delete') {
 		$text = $langs->trans('ConfirmDeleteSalary');
-		print $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('DeleteSalary'), $text, 'confirm_delete', '', '', 2);
+		$formconfirm = $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$object->id, $langs->trans('DeleteSalary'), $text, 'confirm_delete', '', '', 2);
 	}
 
 	if ($action == 'edit') {
 		print "<form name=\"charge\" action=\"".$_SERVER["PHP_SELF"]."?id=$object->id&amp;action=update\" method=\"post\">";
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 	}
+
+	/**BACKPORT_FROM_16.0 **/
+	// Call Hook formConfirm
+	$parameters = array('formConfirm' => $formconfirm);
+	$reshook = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+	if (empty($reshook)) {
+		$formconfirm .= $hookmanager->resPrint;
+	} elseif ($reshook > 0) {
+		$formconfirm = $hookmanager->resPrint;
+	}
+
+	// Print form confirm
+	print $formconfirm;
+	/**END BACKPORT_FROM_16.0 **/
 
 	print dol_get_fiche_head($head, 'card', $langs->trans("SalaryPayment"), -1, 'salary');
 

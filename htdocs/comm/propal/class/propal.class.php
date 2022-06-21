@@ -552,10 +552,11 @@ class Propal extends CommonObject
 	 *      @param		int			$origin_id			Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be Id of origin object (aka line id), else object id
 	 * 		@param		double		$pu_ht_devise		Unit price in currency
 	 * 		@param		int    		$fk_remise_except	Id discount if line is from a discount
+	 *  	@param		int			$noupdateafterinsertline	No update after insert of line
 	 *    	@return    	int         	    			>0 if OK, <0 if KO
 	 *    	@see       	add_product()
 	 */
-	public function addline($desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $fk_product = 0, $remise_percent = 0.0, $price_base_type = 'HT', $pu_ttc = 0.0, $info_bits = 0, $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $fk_remise_except = 0)
+	public function addline($desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $fk_product = 0, $remise_percent = 0.0, $price_base_type = 'HT', $pu_ttc = 0.0, $info_bits = 0, $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $fk_remise_except = 0, $noupdateafterinsertline = 0)
 	{
 		global $mysoc, $conf, $langs;
 
@@ -744,7 +745,9 @@ class Propal extends CommonObject
 				}
 
 				// Mise a jour informations denormalisees au niveau de la propale meme
-				$result = $this->update_price(1, 'auto', 0, $mysoc); // This method is designed to add line from user input so total calculation must be done using 'auto' mode.
+				if (empty($noupdateafterinsertline)) {
+					$result = $this->update_price(1, 'auto', 0, $mysoc); // This method is designed to add line from user input so total calculation must be done using 'auto' mode.
+				}
 
 				if ($result > 0) {
 					$this->db->commit();
@@ -987,6 +990,8 @@ class Propal extends CommonObject
 				$this->db->commit();
 				return 1;
 			} else {
+				$this->error = $line->error;
+				$this->errors = $line->errors;
 				$this->db->rollback();
 				return -1;
 			}
@@ -1007,7 +1012,7 @@ class Propal extends CommonObject
 	 */
 	public function create($user, $notrigger = 0)
 	{
-		global $conf, $hookmanager;
+		global $conf, $hookmanager, $mysoc;
 		$error = 0;
 
 		$now = dol_now();
@@ -1236,7 +1241,10 @@ class Propal extends CommonObject
 							$line->array_options,
 							$line->fk_unit,
 							$origintype,
-							$originid
+							$originid,
+							0,
+							0,
+							1
 						);
 
 						if ($result < 0) {
@@ -1265,7 +1273,7 @@ class Propal extends CommonObject
 
 				if (!$error) {
 					// Mise a jour infos denormalisees
-					$resql = $this->update_price(1);
+					$resql = $this->update_price(1, 'auto', 0, $mysoc);
 					if ($resql) {
 						$action = 'update';
 
@@ -1447,6 +1455,7 @@ class Propal extends CommonObject
 		$sql = "SELECT p.rowid, p.ref, p.entity, p.remise, p.remise_percent, p.remise_absolue, p.fk_soc";
 		$sql .= ", p.total_ttc, p.total_tva, p.localtax1, p.localtax2, p.total_ht";
 		$sql .= ", p.datec";
+		$sql .= ", p.date_signature as dates";
 		$sql .= ", p.date_valid as datev";
 		$sql .= ", p.datep as dp";
 		$sql .= ", p.fin_validite as dfv";
@@ -1530,6 +1539,7 @@ class Propal extends CommonObject
 				$this->date_creation = $this->db->jdate($obj->datec); //Creation date
 				$this->date_validation = $this->db->jdate($obj->datev); //Validation date
 				$this->date_modification = $this->db->jdate($obj->date_modification); // tms
+				$this->date_signature = $this->db->jdate($obj->dates); // Signature date
 				$this->date                 = $this->db->jdate($obj->dp); // Proposal date
 				$this->datep                = $this->db->jdate($obj->dp); // deprecated
 				$this->fin_validite         = $this->db->jdate($obj->dfv);
@@ -4172,36 +4182,40 @@ class PropaleLigne extends CommonObjectLine
 		$error = 0;
 		$this->db->begin();
 
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."propaldet WHERE rowid = ".((int) $this->rowid);
-		dol_syslog("PropaleLigne::delete", LOG_DEBUG);
-		if ($this->db->query($sql)) {
-			// Remove extrafields
-			if (!$error) {
-				$this->id = $this->rowid;
-				$result = $this->deleteExtraFields();
-				if ($result < 0) {
-					$error++;
-					dol_syslog(get_class($this)."::delete error -4 ".$this->error, LOG_ERR);
-				}
+		if (!$notrigger) {
+			// Call trigger
+			$result = $this->call_trigger('LINEPROPAL_DELETE', $user);
+			if ($result < 0) {
+				$error++;
 			}
+		}
+		// End call triggers
 
-			if (!$error && !$notrigger) {
-				// Call trigger
-				$result = $this->call_trigger('LINEPROPAL_DELETE', $user);
-				if ($result < 0) {
-					$this->db->rollback();
-					return -1;
+		if (!$error) {
+			$sql = "DELETE FROM " . MAIN_DB_PREFIX . "propaldet WHERE rowid = " . ((int) $this->rowid);
+			dol_syslog("PropaleLigne::delete", LOG_DEBUG);
+			if ($this->db->query($sql)) {
+				// Remove extrafields
+				if (!$error) {
+					$this->id = $this->rowid;
+					$result = $this->deleteExtraFields();
+					if ($result < 0) {
+						$error++;
+						dol_syslog(get_class($this) . "::delete error -4 " . $this->error, LOG_ERR);
+					}
 				}
+			} else {
+				$this->error = $this->db->error() . " sql=" . $sql;
+				$error++;
 			}
-			// End call triggers
+		}
 
-			$this->db->commit();
-
-			return 1;
-		} else {
-			$this->error = $this->db->error()." sql=".$sql;
+		if ($error) {
 			$this->db->rollback();
 			return -1;
+		} else {
+			$this->db->commit();
+			return 1;
 		}
 	}
 

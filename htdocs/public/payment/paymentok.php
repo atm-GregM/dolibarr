@@ -245,7 +245,7 @@ if (!empty($conf->paypal->enabled)) {
 			$fulltag            = $FULLTAG;
 			$payerID            = $PAYPALPAYERID;
 			// Set by newpayment.php
-			$paymentType        = $_SESSION['PaymentType'];
+			$paymentType        = $_SESSION['PaymentType'];			// Value can be 'Mark', 'Sole', 'Sale' for example
 			$currencyCodeType   = $_SESSION['currencyCodeType'];
 			$FinalPaymentAmt    = $_SESSION["FinalPaymentAmt"];
 			// From env
@@ -406,13 +406,22 @@ if ($ispaymentok) {
 				$paymentTypeId = $conf->global->STRIPE_PAYMENT_MODE_FOR_PAYMENTS;
 			}
 			if (empty($paymentTypeId)) {
+				dol_syslog("paymentType = ".$paymentType, LOG_DEBUG, 0, '_payment');
+
 				if (empty($paymentType)) {
 					$paymentType = 'CB';
 				}
+				// May return nothing when paymentType means nothing
+				// (for example when paymentType is 'Mark', 'Sole', 'Sale', for paypal)
 				$paymentTypeId = dol_getIdFromCode($db, $paymentType, 'c_paiement', 'code', 'id', 1);
+
+				// If previous line has returned nothing, we force to get the ID of payment of Credit Card (hard coded code 'CB').
+				if (empty($paymentTypeId) || $paymentTypeId < 0) {
+					$paymentTypeId = dol_getIdFromCode($db, 'CB', 'c_paiement', 'code', 'id', 1);
+				}
 			}
 
-			dol_syslog("FinalPaymentAmt=".$FinalPaymentAmt." paymentTypeId=".$paymentTypeId." currencyCodeType=".$currencyCodeType, LOG_DEBUG, 0, '_payment');
+			dol_syslog("FinalPaymentAmt=".$FinalPaymentAmt." paymentTypeId=".$paymentTypeId." paymentType=".$paymentType." currencyCodeType=".$currencyCodeType, LOG_DEBUG, 0, '_payment');
 
 			// Do action only if $FinalPaymentAmt is set (session variable is cleaned after this page to avoid duplicate actions when page is POST a second time)
 			if (!empty($FinalPaymentAmt) && $paymentTypeId > 0) {
@@ -783,10 +792,19 @@ if ($ispaymentok) {
 				$paymentTypeId = $conf->global->STRIPE_PAYMENT_MODE_FOR_PAYMENTS;
 			}
 			if (empty($paymentTypeId)) {
+				dol_syslog("paymentType = ".$paymentType, LOG_DEBUG, 0, '_payment');
+
 				if (empty($paymentType)) {
 					$paymentType = 'CB';
 				}
+				// May return nothing when paymentType means nothing
+				// (for example when paymentType is 'Mark', 'Sole', 'Sale', for paypal)
 				$paymentTypeId = dol_getIdFromCode($db, $paymentType, 'c_paiement', 'code', 'id', 1);
+
+				// If previous line has returned nothing, we force to get the ID of payment of Credit Card (hard coded code 'CB').
+				if (empty($paymentTypeId) || $paymentTypeId < 0) {
+					$paymentTypeId = dol_getIdFromCode($db, 'CB', 'c_paiement', 'code', 'id', 1);
+				}
 			}
 
 			// Do action only if $FinalPaymentAmt is set (session variable is cleaned after this page to avoid duplicate actions when page is POST a second time)
@@ -876,12 +894,29 @@ if ($ispaymentok) {
 			$FinalPaymentAmt = $_SESSION["FinalPaymentAmt"];
 
 			$paymentTypeId = 0;
-			if ($paymentmethod == 'paybox') $paymentTypeId = $conf->global->PAYBOX_PAYMENT_MODE_FOR_PAYMENTS;
-			if ($paymentmethod == 'paypal') $paymentTypeId = $conf->global->PAYPAL_PAYMENT_MODE_FOR_PAYMENTS;
-			if ($paymentmethod == 'stripe') $paymentTypeId = $conf->global->STRIPE_PAYMENT_MODE_FOR_PAYMENTS;
+			if ($paymentmethod == 'paybox') {
+				$paymentTypeId = $conf->global->PAYBOX_PAYMENT_MODE_FOR_PAYMENTS;
+			}
+			if ($paymentmethod == 'paypal') {
+				$paymentTypeId = $conf->global->PAYPAL_PAYMENT_MODE_FOR_PAYMENTS;
+			}
+			if ($paymentmethod == 'stripe') {
+				$paymentTypeId = $conf->global->STRIPE_PAYMENT_MODE_FOR_PAYMENTS;
+			}
 			if (empty($paymentTypeId)) {
-				if (empty($paymentType)) $paymentType = 'CB';
+				dol_syslog("paymentType = ".$paymentType, LOG_DEBUG, 0, '_payment');
+
+				if (empty($paymentType)) {
+					$paymentType = 'CB';
+				}
+				// May return nothing when paymentType means nothing
+				// (for example when paymentType is 'Mark', 'Sole', 'Sale', for paypal)
 				$paymentTypeId = dol_getIdFromCode($db, $paymentType, 'c_paiement', 'code', 'id', 1);
+
+				// If previous line has returned nothing, we force to get the ID of payment of Credit Card (hard coded code 'CB').
+				if (empty($paymentTypeId) || $paymentTypeId < 0) {
+					$paymentTypeId = dol_getIdFromCode($db, 'CB', 'c_paiement', 'code', 'id', 1);
+				}
 			}
 
 			// Do action only if $FinalPaymentAmt is set (session variable is cleaned after this page to avoid duplicate actions when page is POST a second time)
@@ -986,10 +1021,19 @@ if ($ispaymentok) {
 				$paymentTypeId = $conf->global->STRIPE_PAYMENT_MODE_FOR_PAYMENTS;
 			}
 			if (empty($paymentTypeId)) {
+				dol_syslog("paymentType = ".$paymentType, LOG_DEBUG, 0, '_payment');
+
 				if (empty($paymentType)) {
 					$paymentType = 'CB';
 				}
+				// May return nothing when paymentType means nothing
+				// (for example when paymentType is 'Mark', 'Sole', 'Sale', for paypal)
 				$paymentTypeId = dol_getIdFromCode($db, $paymentType, 'c_paiement', 'code', 'id', 1);
+
+				// If previous line has returned nothing, we force to get the ID of payment of Credit Card (hard coded code 'CB').
+				if (empty($paymentTypeId) || $paymentTypeId < 0) {
+					$paymentTypeId = dol_getIdFromCode($db, 'CB', 'c_paiement', 'code', 'id', 1);
+				}
 			}
 
 			// Do action only if $FinalPaymentAmt is set (session variable is cleaned after this page to avoid duplicate actions when page is POST a second time)
@@ -1091,10 +1135,19 @@ if ($ispaymentok) {
 				$paymentTypeId = $conf->global->STRIPE_PAYMENT_MODE_FOR_PAYMENTS;
 			}
 			if (empty($paymentTypeId)) {
+				dol_syslog("paymentType = ".$paymentType, LOG_DEBUG, 0, '_payment');
+
 				if (empty($paymentType)) {
 					$paymentType = 'CB';
 				}
+				// May return nothing when paymentType means nothing
+				// (for example when paymentType is 'Mark', 'Sole', 'Sale', for paypal)
 				$paymentTypeId = dol_getIdFromCode($db, $paymentType, 'c_paiement', 'code', 'id', 1);
+
+				// If previous line has returned nothing, we force to get the ID of payment of Credit Card (hard coded code 'CB').
+				if (empty($paymentTypeId) || $paymentTypeId < 0) {
+					$paymentTypeId = dol_getIdFromCode($db, 'CB', 'c_paiement', 'code', 'id', 1);
+				}
 			}
 
 			// Do action only if $FinalPaymentAmt is set (session variable is cleaned after this page to avoid duplicate actions when page is POST a second time)
@@ -1207,19 +1260,22 @@ if ($ispaymentok) {
 							$outputlangs = new Translate('', $conf);
 							$outputlangs->setDefaultLang(empty($thirdparty->default_lang) ? $mysoc->default_lang : $thirdparty->default_lang);
 							// Load traductions files required by page
-							$outputlangs->loadLangs(array("main", "members"));
+							$outputlangs->loadLangs(array("main", "members", "eventorganization"));
 							// Get email content from template
 							$arraydefaultmessage = null;
 
-							$labeltouse = $conf->global->EVENTORGANIZATION_TEMPLATE_EMAIL_AFT_SUBS_EVENT;
+							$idoftemplatetouse = $conf->global->EVENTORGANIZATION_TEMPLATE_EMAIL_AFT_SUBS_EVENT;	// Email to send for Event organization registration
 
-							if (!empty($labeltouse)) {
-								$arraydefaultmessage = $formmail->getEMailTemplate($db, 'conferenceorbooth', $user, $outputlangs, $labeltouse, 1, '');
+							if (!empty($idoftemplatetouse)) {
+								$arraydefaultmessage = $formmail->getEMailTemplate($db, 'conferenceorbooth', $user, $outputlangs, $idoftemplatetouse, 1, '');
 							}
 
-							if (!empty($labeltouse) && is_object($arraydefaultmessage) && $arraydefaultmessage->id > 0) {
+							if (!empty($idoftemplatetouse) && is_object($arraydefaultmessage) && $arraydefaultmessage->id > 0) {
 								$subject = $arraydefaultmessage->topic;
 								$msg     = $arraydefaultmessage->content;
+							} else {
+								$subject = '['.$object->ref.' - '.$outputlangs->trans("NewRegistration").']';
+								$msg = $outputlangs->trans("OrganizationEventPaymentOfRegistrationWasReceived");
 							}
 
 							$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $thirdparty);
@@ -1234,13 +1290,28 @@ if ($ispaymentok) {
 
 							$ishtml = dol_textishtml($texttosend); // May contain urls
 
-							$mailfile = new CMailFile($subjecttosend, $sendto, $from, $texttosend, array(), array(), array(), '', '', 0, $ishtml);
+							// Attach a file ?
+							$file = '';
+							$listofpaths = array();
+							$listofnames = array();
+							$listofmimes = array();
+							if (is_object($object)) {
+								$invoicediroutput = $conf->facture->dir_output;
+								$fileparams = dol_most_recent_file($invoicediroutput.'/'.$object->ref, preg_quote($object->ref, '/').'[^\-]+');
+								$file = $fileparams['fullname'];
+
+								$listofpaths = array($file);
+								$listofnames = array(basename($file));
+								$listofmimes = array(dol_mimetype($file));
+							}
+
+							$mailfile = new CMailFile($subjecttosend, $sendto, $from, $texttosend, $listofpaths, $listofmimes, $listofnames, '', '', 0, $ishtml);
 
 							$result = $mailfile->sendfile();
 							if ($result) {
 								dol_syslog("EMail sent to ".$sendto, LOG_DEBUG, 0, '_payment');
 							} else {
-								dol_syslog("Failed to send EMail to ".$sendto, LOG_ERR, 0, '_payment');
+								dol_syslog("Failed to send EMail to ".$sendto.' - '.$mailfile->error, LOG_ERR, 0, '_payment');
 							}
 						}
 					}
@@ -1272,10 +1343,19 @@ if ($ispaymentok) {
 				$paymentTypeId = $conf->global->STRIPE_PAYMENT_MODE_FOR_PAYMENTS;
 			}
 			if (empty($paymentTypeId)) {
+				dol_syslog("paymentType = ".$paymentType, LOG_DEBUG, 0, '_payment');
+
 				if (empty($paymentType)) {
 					$paymentType = 'CB';
 				}
+				// May return nothing when paymentType means nothing
+				// (for example when paymentType is 'Mark', 'Sole', 'Sale', for paypal)
 				$paymentTypeId = dol_getIdFromCode($db, $paymentType, 'c_paiement', 'code', 'id', 1);
+
+				// If previous line has returned nothing, we force to get the ID of payment of Credit Card (hard coded code 'CB').
+				if (empty($paymentTypeId) || $paymentTypeId < 0) {
+					$paymentTypeId = dol_getIdFromCode($db, 'CB', 'c_paiement', 'code', 'id', 1);
+				}
 			}
 
 			// Do action only if $FinalPaymentAmt is set (session variable is cleaned after this page to avoid duplicate actions when page is POST a second time)
@@ -1383,18 +1463,22 @@ if ($ispaymentok) {
 										$outputlangs = new Translate('', $conf);
 										$outputlangs->setDefaultLang(empty($thirdparty->default_lang) ? $mysoc->default_lang : $thirdparty->default_lang);
 										// Load traductions files required by page
-										$outputlangs->loadLangs(array("main", "members"));
+										$outputlangs->loadLangs(array("main", "members", "eventorganization"));
 										// Get email content from template
 										$arraydefaultmessage = null;
 
-										$labeltouse = $conf->global->EVENTORGANIZATION_TEMPLATE_EMAIL_AFT_SUBS_EVENT;
-										if (!empty($labeltouse)) {
-											$arraydefaultmessage = $formmail->getEMailTemplate($db, 'conferenceorbooth', $user, $outputlangs, $labeltouse, 1, '');
+										$idoftemplatetouse = $conf->global->EVENTORGANIZATION_TEMPLATE_EMAIL_AFT_SUBS_BOOTH;	// Email sent after registration for a Booth
+
+										if (!empty($idoftemplatetouse)) {
+											$arraydefaultmessage = $formmail->getEMailTemplate($db, 'conferenceorbooth', $user, $outputlangs, $idoftemplatetouse, 1, '');
 										}
 
-										if (!empty($labeltouse) && is_object($arraydefaultmessage) && $arraydefaultmessage->id > 0) {
+										if (!empty($idoftemplatetouse) && is_object($arraydefaultmessage) && $arraydefaultmessage->id > 0) {
 											$subject = $arraydefaultmessage->topic;
 											$msg     = $arraydefaultmessage->content;
+										} else {
+											$subject = '['.$booth->ref.' - '.$outputlangs->trans("NewRegistration").']';
+											$msg = $outputlangs->trans("OrganizationEventPaymentOfBoothWasReceived");
 										}
 
 										$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $thirdparty);

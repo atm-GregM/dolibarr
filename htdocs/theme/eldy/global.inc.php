@@ -168,6 +168,10 @@ table.liste th.wrapcolumntitle.liste_titre:not(.maxwidthsearch), table.liste td.
 .liste_titre input[name=search_day_date_when], .liste_titre input[name=search_month_date_when], .liste_titre input[name=search_year_date_when],
 .liste_titre input[name=search_dtstartday], .liste_titre input[name=search_dtendday], .liste_titre input[name=search_dtstartmonth], .liste_titre input[name=search_dtendmonth],
 */
+.liste_titre input[name=search_month] {
+	margin-right: 4px;
+}
+
 select#date_startday, select#date_startmonth, select#date_endday, select#date_endmonth, select#reday, select#remonth,
 input, input.flat, form.flat select, select, select.flat, .dataTables_length label select {
 	border: none;
@@ -3477,6 +3481,8 @@ div .tdtop {
 	vertical-align: top !important;
 	/*padding-top: 10px !important;
 	padding-bottom: 2px !important; */
+	padding-top: 6px !important;
+	padding-bottom: 4px !important;
 }
 
 table.border td, table.bordernooddeven td, div.border div div.tagtd {
@@ -5210,7 +5216,7 @@ td.cal_other_month {
 /* ============================================================================== */
 
 /* CSS for treeview */
-.treeview ul { background-color: transparent !important; margin-bottom: 4px !important; margin-top: 0 !important; padding-top: 8px !important; }
+.treeview ul { background-color: transparent !important; margin-bottom: 4px !important; margin-top: 0 !important; padding-top: 2px !important; }
 .treeview li { background-color: transparent !important; padding: 0 0 0 16px !important; min-height: 30px; }
 .treeview .hover { color: var(--colortextlink) !important; text-decoration: underline !important; }
 .treeview .hitarea { margin-top: 3px; }
@@ -6204,6 +6210,10 @@ span#select2-boxbookmark-container {
   overflow: hidden;
 }
 
+ul.select2-results__options li {
+	font-size: 0.95em;
+}
+
 
 /* ============================================================================== */
 /*  For categories                                                                */
@@ -6223,7 +6233,7 @@ span.noborderoncategories a, li.noborderoncategories a {
 	/* vertical-align: top; */
 }
 span.noborderoncategories {
-	padding: 4px 5px 0px 5px;
+	padding: 3px 5px 3px 5px;
 	display: inline-block;
 }
 .categtextwhite, .treeview .categtextwhite.hover {
@@ -7370,7 +7380,7 @@ div.clipboardCPValue.hidewithsize {
 	}
 
 	#divbodywebsite {
-		word-break: break-all;
+		word-break: break-word;
 	}
 
 	.websiteselectionsection {
@@ -7388,6 +7398,21 @@ div.clipboardCPValue.hidewithsize {
 
 	.a-mesure, .a-mesure-disabled {
 		text-align: center;
+	}
+
+
+	div.fichehalfright {
+		margin-top: 30px;
+	}
+
+	.valuefield.fieldname_type span.badgeneutral {
+		margin-top: 5px;
+		display: inline-block;
+	}
+
+	tr.trextrafieldseparator td, tr.trextrafields_collapse_last td {
+		/* border-bottom: 2px solid var(--colorbackhmenu1) !important; */
+		border-bottom: 1px solid var(--colortopbordertitle1) !important;
 	}
 }
 
@@ -7422,6 +7447,11 @@ if (!empty($conf->global->THEME_CUSTOM_CSS)) {
 }
 
 ?>
+
+	div.extra_inline_chkbxlst,
+	div.extra_inline_checkbox {
+		min-width:150px;
+	}
 
 /* Must be at end */
 div.flot-text .flot-tick-label .tickLabel, .fa-color-unset {

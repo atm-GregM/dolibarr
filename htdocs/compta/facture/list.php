@@ -10,7 +10,7 @@
  * Copyright (C) 2013      Florian Henry         <florian.henry@open-concept.pro>
  * Copyright (C) 2013      Cédric Salvador       <csalvador@gpcsolutions.fr>
  * Copyright (C) 2015      Jean-François Ferry   <jfefe@aternatik.fr>
- * Copyright (C) 2015-2021 Ferran Marcet         <fmarcet@2byte.es>
+ * Copyright (C) 2015-2022 Ferran Marcet         <fmarcet@2byte.es>
  * Copyright (C) 2017      Josep Lluís Amador    <joseplluis@lliuretic.cat>
  * Copyright (C) 2018      Charlene Benke        <charlie@patas-monkey.com>
  * Copyright (C) 2019-2021 Alexandre Spangaro    <aspangaro@open-dsi.fr>
@@ -261,14 +261,14 @@ if (getDolGlobalString("INVOICE_USE_SITUATION") && $conf->global->INVOICE_USE_RE
 foreach ($object->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) {
-		$visible = (int) dol_eval($val['visible'], 1);
+		$visible = (int) dol_eval($val['visible'], 1, 1, '1');
 		$newkey = '';
 		if (array_key_exists($key, $arrayfields)) { $newkey = $key; } elseif (array_key_exists('t.'.$key, $arrayfields)) { $newkey = 't.'.$key; } elseif (array_key_exists('f.'.$key, $arrayfields)) { $newkey = 'f.'.$key; } elseif (array_key_exists('s.'.$key, $arrayfields)) { $newkey = 's.'.$key; }
 		if ($newkey) {
 			$arrayfields[$newkey] = array(
 				'label'=>$val['label'],
 				'checked'=>(($visible < 0) ? 0 : 1),
-				'enabled'=>($visible != 3 && dol_eval($val['enabled'], 1)),
+				'enabled'=>($visible != 3 && dol_eval($val['enabled'], 1, 1, '1')),
 				'position'=>$val['position'],
 				'help' => empty($val['help']) ? '' : $val['help'],
 			);
@@ -845,12 +845,28 @@ $sql .= ' f.rowid DESC ';
 
 $nbtotalofrecords = '';
 if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
+	/* This old and fast method to get and count full list returns all record so use a high amount of memory.
 	$result = $db->query($sql);
 	$nbtotalofrecords = $db->num_rows($result);
-	if (($page * $limit) > $nbtotalofrecords) {	// if total resultset is smaller then paging size (filtering), goto and load page 0
+	*/
+	/* The fast and low memory method to get and count full list converts the sql into a sql count */
+	if ($sall || $search_product_category > 0 || $search_user > 0) {
+		$sqlforcount = preg_replace('/^SELECT[a-zA-Z0-9\._\s\(\),=<>\:\-\']+\sFROM/', 'SELECT COUNT(DISTINCT f.rowid) as nbtotalofrecords FROM', $sql);
+	} else {
+		$sqlforcount = preg_replace('/^SELECT[a-zA-Z0-9\._\s\(\),=<>\:\-\']+\sFROM/', 'SELECT COUNT(f.rowid) as nbtotalofrecords FROM', $sql);
+		$sqlforcount = preg_replace('/LEFT JOIN '.MAIN_DB_PREFIX.'paiement_facture as pf ON pf.fk_facture = f.rowid/', '', $sqlforcount);
+	}
+	$sqlforcount = preg_replace('/GROUP BY.*$/', '', $sqlforcount);
+
+	$resql = $db->query($sqlforcount);
+	$objforcount = $db->fetch_object($resql);
+	$nbtotalofrecords = $objforcount->nbtotalofrecords;
+
+	if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
 		$page = 0;
 		$offset = 0;
 	}
+	$db->free($resql);
 }
 
 $sql .= $db->plimit($limit + 1, $offset);
@@ -2060,7 +2076,7 @@ if ($resql) {
 				// Sales representatives
 				print '<td>';
 				if ($obj->socid > 0) {
-					$listsalesrepresentatives = $thirdpartystatic->getSalesRepresentatives($user);
+					$listsalesrepresentatives = $companystatic->getSalesRepresentatives($user);
 					if ($listsalesrepresentatives < 0) {
 						dol_print_error($db);
 					}

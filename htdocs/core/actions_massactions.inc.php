@@ -1246,9 +1246,9 @@ if (!$error && $massaction == 'validate' && $permissiontoadd) {
 						$model = $objecttmp->model_pdf;
 						$ret = $objecttmp->fetch($objecttmp->id); // Reload to get new records
 						// To be sure vars is defined
-						$hidedetails = !empty($hidedetails) ? $hidedetails : 0;
-						$hidedesc = !empty($hidedesc) ? $hidedesc : 0;
-						$hideref = !empty($hideref) ? $hideref : 0;
+						$hidedetails = !empty($hidedetails) ? $hidedetails : (!empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0);
+						$hidedesc = !empty($hidedesc) ? $hidedesc : (!empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0);
+						$hideref = !empty($hideref) ? $hideref : (!empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0);
 						$moreparams = !empty($moreparams) ? $moreparams : null;
 
 						$result = $objecttmp->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
@@ -1397,13 +1397,13 @@ if (!$error && $massaction == 'generate_doc' && $permissiontoread) {
 
 			// To be sure vars is defined
 			if (empty($hidedetails)) {
-				$hidedetails = 0;
+				$hidedetails = (!empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0);
 			}
 			if (empty($hidedesc)) {
-				$hidedesc = 0;
+				$hidedesc = (!empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0);
 			}
 			if (empty($hideref)) {
-				$hideref = 0;
+				$hideref = (!empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0);
 			}
 			if (empty($moreparams)) {
 				$moreparams = null;
@@ -1579,17 +1579,20 @@ if (!$error && ($massaction == 'approveleave' || ($action == 'approveleave' && $
 	$nbok = 0;
 	foreach ($toselect as $toselectid) {
 		$result = $objecttmp->fetch($toselectid);
-		if ($result>0) {
-			if ($objecttmp->statut == Holiday::STATUS_VALIDATED && $user->id == $objecttmp->fk_validator) {
+		if ($result > 0) {
+			if ($objecttmp->statut != Holiday::STATUS_VALIDATED) {
+				setEventMessages($langs->trans('StatusOfRefMustBe', $objecttmp->ref, $langs->transnoentitiesnoconv('Validated')), null, 'warnings');
+				continue;
+			}
+			if ($user->id == $objecttmp->fk_validator) {
 				$objecttmp->oldcopy = dol_clone($objecttmp);
 
 				$objecttmp->date_valid = dol_now();
 				$objecttmp->fk_user_valid = $user->id;
 				$objecttmp->statut = Holiday::STATUS_APPROVED;
 
-				$db->begin();
-
 				$verif = $objecttmp->approve($user);
+
 				if ($verif <= 0) {
 					setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
 					$error++;
@@ -1653,6 +1656,7 @@ if (!$error && ($massaction == 'approveleave' || ($action == 'approveleave' && $
 
 						$trackid = 'leav'.$objecttmp->id;
 
+						require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 						$mail = new CMailFile($subject, $emailTo, $emailFrom, $message, array(), array(), array(), '', '', 0, 0, '', '', $trackid);
 
 						// Sending email
@@ -1664,14 +1668,9 @@ if (!$error && ($massaction == 'approveleave' || ($action == 'approveleave' && $
 						}
 					}
 				}
-
-				if (!$error) {
-					$db->commit();
-					$nbok++;
-				} else {
-					$db->rollback();
-					$action = '';
-				}
+			} else {
+				$langs->load("errors");
+				setEventMessages($langs->trans('ErrorNotApproverForHoliday', $objecttmp->ref), null, 'errors');
 			}
 		} else {
 			setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
@@ -1683,7 +1682,7 @@ if (!$error && ($massaction == 'approveleave' || ($action == 'approveleave' && $
 	if (!$error) {
 		if ($nbok > 1) {
 			setEventMessages($langs->trans("RecordsApproved", $nbok), null, 'mesgs');
-		} else {
+		} elseif ($nbok == 1) {
 			setEventMessages($langs->trans("RecordAproved"), null, 'mesgs');
 		}
 		$db->commit();

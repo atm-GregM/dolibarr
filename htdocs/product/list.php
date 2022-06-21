@@ -178,7 +178,7 @@ if (!empty($conf->barcode->enabled)) {
 	$fieldstosearchall['p.barcode'] = 'Gencod';
 	$fieldstosearchall['pfp.barcode'] = 'GencodBuyPrice';
 }
-// Personalized search criterias. Example: $conf->global->PRODUCT_QUICKSEARCH_ON_FIELDS = 'p.ref=ProductRef;p.label=ProductLabel'
+// Personalized search criterias. Example: $conf->global->PRODUCT_QUICKSEARCH_ON_FIELDS = 'p.ref=ProductRef;p.label=ProductLabel;p.description=Description;p.note=Note;'
 if (!empty($conf->global->PRODUCT_QUICKSEARCH_ON_FIELDS)) {
 	$fieldstosearchall = dolExplodeIntoArray($conf->global->PRODUCT_QUICKSEARCH_ON_FIELDS);
 }
@@ -244,11 +244,11 @@ $arrayfields = array(
 /*foreach ($object->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) {
-		$visible = dol_eval($val['visible'], 1);
+		$visible = dol_eval($val['visible'], 1, 1, '1');
 		$arrayfields['p.'.$key] = array(
 			'label'=>$val['label'],
 			'checked'=>(($visible < 0) ? 0 : 1),
-			'enabled'=>($visible != 3 && dol_eval($val['enabled'], 1)),
+			'enabled'=>($visible != 3 && dol_eval($val['enabled'], 1, 1, '1')),
 			'position'=>$val['position']
 		);
 	}
@@ -800,10 +800,13 @@ if ($resql) {
 	}
 
 	if ($sall) {
+		$setupstring = '';
 		foreach ($fieldstosearchall as $key => $val) {
 			$fieldstosearchall[$key] = $langs->trans($val);
+			$setupstring .= $key."=".$val.";";
 		}
-		print '<div class="divsearchfieldfilter">'.$langs->trans("FilterOnInto", $sall).join(', ', $fieldstosearchall).'</div>';
+		print '<!-- Search done like if PRODUCT_QUICKSEARCH_ON_FIELDS = '.$setupstring.' -->'."\n";
+		print '<div class="divsearchfieldfilter">'.$langs->trans("FilterOnInto", $sall).join(', ', $fieldstosearchall).'</div>'."\n";
 	}
 
 	// Filter on categories

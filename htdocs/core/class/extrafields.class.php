@@ -915,9 +915,9 @@ class ExtraFields
 			$unique = $this->attributes[$extrafieldsobjectkey]['unique'][$key];
 			$required = $this->attributes[$extrafieldsobjectkey]['required'][$key];
 			$param = $this->attributes[$extrafieldsobjectkey]['param'][$key];
-			$perms = dol_eval($this->attributes[$extrafieldsobjectkey]['perms'][$key], 1);
+			$perms = dol_eval($this->attributes[$extrafieldsobjectkey]['perms'][$key], 1, 1, '1');
 			$langfile = $this->attributes[$extrafieldsobjectkey]['langfile'][$key];
-			$list = dol_eval($this->attributes[$extrafieldsobjectkey]['list'][$key], 1);
+			$list = dol_eval($this->attributes[$extrafieldsobjectkey]['list'][$key], 1, 1, '1');
 			$totalizable = $this->attributes[$extrafieldsobjectkey]['totalizable'][$key];
 			$help = $this->attributes[$extrafieldsobjectkey]['help'][$key];
 			$hidden = (empty($list) ? 1 : 0); // If empty, we are sure it is hidden, otherwise we show. If it depends on mode (view/create/edit form or list, this must be filtered by caller)
@@ -1505,9 +1505,9 @@ class ExtraFields
 			$unique = $this->attributes[$extrafieldsobjectkey]['unique'][$key];
 			$required = $this->attributes[$extrafieldsobjectkey]['required'][$key];
 			$param = $this->attributes[$extrafieldsobjectkey]['param'][$key];
-			$perms = dol_eval($this->attributes[$extrafieldsobjectkey]['perms'][$key], 1);
+			$perms = dol_eval($this->attributes[$extrafieldsobjectkey]['perms'][$key], 1, 1, '1');
 			$langfile = $this->attributes[$extrafieldsobjectkey]['langfile'][$key];
-			$list = dol_eval($this->attributes[$extrafieldsobjectkey]['list'][$key], 1);
+			$list = dol_eval($this->attributes[$extrafieldsobjectkey]['list'][$key], 1, 1, '1');
 			$help = $this->attributes[$extrafieldsobjectkey]['help'][$key];
 			$hidden = (empty($list) ? 1 : 0); // If $list empty, we are sure it is hidden, otherwise we show. If it depends on mode (view/create/edit form or list, this must be filtered by caller)
 		} else {
@@ -1557,7 +1557,7 @@ class ExtraFields
 		} elseif ($type == 'price') {
 			//$value = price($value, 0, $langs, 0, 0, -1, $conf->currency);
 			if ($value || $value == '0') {
-				$value = price($value, 0, $langs, 0, 0, -1);
+				$value = price($value, 0, $langs, 0, $conf->global->MAIN_MAX_DECIMALS_TOT, -1).' '.$langs->getCurrencySymbol($conf->currency);
 			}
 		} elseif ($type == 'select') {
 			$valstr = (!empty($param['options'][$value]) ? $param['options'][$value] : '');
@@ -1644,15 +1644,18 @@ class ExtraFields
 						}
 					}
 				} else {
-					require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-
 					$toprint = array();
 					$obj = $this->db->fetch_object($resql);
-					$c = new Categorie($this->db);
-					$c->fetch($obj->rowid);
-					$ways = $c->print_all_ways(); // $ways[0] = "ccc2 >> ccc2a >> ccc2a1" with html formatted text
-					foreach ($ways as $way) {
-						$toprint[] = '<li class="select2-search-choice-dolibarr noborderoncategories"'.($c->color ? ' style="background: #'.$c->color.';"' : ' style="background: #bbb"').'>'.img_object('', 'category').' '.$way.'</li>';
+					if ($obj->rowid) {
+						require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+						$c = new Categorie($this->db);
+						$result = $c->fetch($obj->rowid);
+						if ($result > 0) {
+							$ways = $c->print_all_ways(); // $ways[0] = "ccc2 >> ccc2a >> ccc2a1" with html formatted text
+							foreach ($ways as $way) {
+								$toprint[] = '<li class="select2-search-choice-dolibarr noborderoncategories"' . ($c->color ? ' style="background: #' . $c->color . ';"' : ' style="background: #bbb"') . '>' . img_object('', 'category') . ' ' . $way . '</li>';
+							}
+						}
 					}
 					$value = '<div class="select2-container-multi-dolibarr" style="width: 90%;"><ul class="select2-choices-dolibarr">'.implode(' ', $toprint).'</ul></div>';
 				}
@@ -1959,17 +1962,17 @@ class ExtraFields
 
 				$enabled = 1;
 				if (isset($this->attributes[$object->table_element]['enabled'][$key])) {	// 'enabled' is often a condition on module enabled or not
-					$enabled = dol_eval($this->attributes[$object->table_element]['enabled'][$key], 1);
+					$enabled = dol_eval($this->attributes[$object->table_element]['enabled'][$key], 1, 1, '1');
 				}
 
 				$visibility = 1;
 				if (isset($this->attributes[$object->table_element]['list'][$key])) {		// 'list' is option for visibility
-					$visibility = dol_eval($this->attributes[$object->table_element]['list'][$key], 1);
+					$visibility = dol_eval($this->attributes[$object->table_element]['list'][$key], 1, 1, '1');
 				}
 
 				$perms = 1;
 				if (isset($this->attributes[$object->table_element]['perms'][$key])) {
-					$perms = dol_eval($this->attributes[$object->table_element]['perms'][$key], 1);
+					$perms = dol_eval($this->attributes[$object->table_element]['perms'][$key], 1, 1, '1');
 				}
 				if (empty($enabled)) {
 					continue;

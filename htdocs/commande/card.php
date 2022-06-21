@@ -1371,7 +1371,7 @@ if (empty($reshook)) {
 	include DOL_DOCUMENT_ROOT.'/core/actions_printing.inc.php';
 
 	// Actions to build doc
-	$upload_dir = !empty($conf->propal->multidir_output[$object->entity])?$conf->propal->multidir_output[$object->entity]:$conf->propal->dir_output;
+	$upload_dir = !empty($conf->commande->multidir_output[$object->entity])?$conf->commande->multidir_output[$object->entity]:$conf->commande->dir_output;
 	$permissiontoadd = $usercancreate;
 	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
@@ -1632,8 +1632,8 @@ if ($action == 'create' && $usercancreate) {
 	if ($socid > 0) {
 		// Contacts (ask contact only if thirdparty already defined).
 		print "<tr><td>".$langs->trans("DefaultContact").'</td><td>';
-		print img_picto('', 'contact');
-		print $form->selectcontacts($soc->id, $contactid, 'contactid', 1, $srccontactslist, '', 1);
+		print img_picto('', 'contact', 'class="pictofixedwidth"');
+		print $form->selectcontacts($soc->id, $contactid, 'contactid', 1, $srccontactslist, '', 1, 'maxwidth200 widthcentpercentminusx');
 		print '</td></tr>';
 
 		// Ligne info remises tiers
@@ -1670,8 +1670,8 @@ if ($action == 'create' && $usercancreate) {
 
 	// Terms of the settlement
 	print '<tr><td class="nowrap">'.$langs->trans('PaymentConditionsShort').'</td><td>';
-	print img_picto('', 'paiment');
-	$form->select_conditions_paiements($cond_reglement_id, 'cond_reglement_id', - 1, 1);
+	print img_picto('', 'payment', 'class="pictofixedwidth"');
+	$form->select_conditions_paiements($cond_reglement_id, 'cond_reglement_id', - 1, 1, 0, 'maxwidth200 widthcentpercentminusx');
 	print '</td></tr>';
 
 	// Payment mode
@@ -1690,7 +1690,7 @@ if ($action == 'create' && $usercancreate) {
 	// Shipping Method
 	if (!empty($conf->expedition->enabled)) {
 		print '<tr><td>'.$langs->trans('SendingMethod').'</td><td>';
-		print img_picto('', 'object_dollyrevert', 'class="pictofixedwidth"');
+		print img_picto('', 'object_dolly', 'class="pictofixedwidth"');
 		print $form->selectShippingMethod($shipping_method_id, 'shipping_method_id', '', 1, '', 0, 'maxwidth200 widthcentpercentminusx');
 		print '</td></tr>';
 	}
@@ -1902,8 +1902,12 @@ if ($action == 'create' && $usercancreate) {
 		if ($action == 'validate') {
 			// We check that object has a temporary ref
 			$ref = substr($object->ref, 1, 4);
-			if ($ref == 'PROV') {
+			if ($ref == 'PROV' || $ref == '') {
 				$numref = $object->getNextNumRef($soc);
+				if (empty($numref)) {
+					$error++;
+					setEventMessages($object->error, $object->errors, 'errors');
+				}
 			} else {
 				$numref = $object->ref;
 			}
@@ -1954,8 +1958,9 @@ if ($action == 'create' && $usercancreate) {
 			if ($nbMandated > 0 ) $text .= '<div><span class="clearboth nowraponall warning">'.$langs->trans("mandatoryPeriodNeedTobeSetMsgValidate").'</span></div>';
 
 
-
-			$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ValidateOrder'), $text, 'confirm_validate', $formquestion, 0, 1, 220);
+			if (!$error) {
+				$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ValidateOrder'), $text, 'confirm_validate', $formquestion, 0, 1, 220);
+			}
 		}
 
 		// Confirm back to draft status
@@ -2558,7 +2563,7 @@ if ($action == 'create' && $usercancreate) {
 				}
 
 				// Create intervention
-				if ($conf->ficheinter->enabled) {
+				if (!empty($conf->ficheinter->enabled)) {
 					$langs->load("interventions");
 
 					if ($object->statut > Commande::STATUS_DRAFT && $object->statut < Commande::STATUS_CLOSED && $object->getNbOfServicesLines() > 0) {

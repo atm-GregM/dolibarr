@@ -394,9 +394,9 @@ class Utils
 									continue;
 								}
 								fwrite($handle, $read.($execmethod == 2 ? '' : "\n"));
-								if (preg_match('/'.preg_quote('-- Dump completed').'/i', $read)) {
+								if (preg_match('/'.preg_quote('-- Dump completed', '/').'/i', $read)) {
 									$ok = 1;
-								} elseif (preg_match('/'.preg_quote('SET SQL_NOTES=@OLD_SQL_NOTES').'/i', $read)) {
+								} elseif (preg_match('/'.preg_quote('SET SQL_NOTES=@OLD_SQL_NOTES', '/').'/i', $read)) {
 									$ok = 1;
 								}
 							}
@@ -847,8 +847,13 @@ class Utils
 				$resarray = $utils->executeCLI($command, $outfile);
 				if ($resarray['result'] != '0') {
 					$this->error = $resarray['error'].' '.$resarray['output'];
+					$this->errors[] = $this->error;
 				}
 				$result = ($resarray['result'] == 0) ? 1 : 0;
+				if ($result < 0 && empty($this->errors)) {
+					$this->error = $langs->trans("ErrorFailToGenerateFile", $FILENAMEDOC);
+					$this->errors[] = $this->error;
+				}
 
 				// Build PDF doc
 				$command = $conf->global->MODULEBUILDER_ASCIIDOCTORPDF.' '.$destfile.' -n -o '.$dirofmoduledoc.'/'.$FILENAMEDOCPDF;
@@ -856,8 +861,13 @@ class Utils
 				$resarray = $utils->executeCLI($command, $outfile);
 				if ($resarray['result'] != '0') {
 					$this->error = $resarray['error'].' '.$resarray['output'];
+					$this->errors[] = $this->error;
 				}
 				$result = ($resarray['result'] == 0) ? 1 : 0;
+				if ($result < 0 && empty($this->errors)) {
+					$this->error = $langs->trans("ErrorFailToGenerateFile", $FILENAMEDOCPDF);
+					$this->errors[] = $this->error;
+				}
 
 				chdir($currentdir);
 			} else {
@@ -868,8 +878,6 @@ class Utils
 				return 1;
 			} else {
 				$error++;
-				$langs->load("errors");
-				$this->error = $langs->trans("ErrorFailToGenerateFile", $outputfiledoc);
 			}
 		} else {
 			$error++;

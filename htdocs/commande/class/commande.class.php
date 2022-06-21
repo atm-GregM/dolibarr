@@ -10,7 +10,7 @@
  * Copyright (C) 2013      Florian Henry		<florian.henry@open-concept.pro>
  * Copyright (C) 2014-2015 Marcos García        <marcosgdf@gmail.com>
  * Copyright (C) 2018      Nicolas ZABOURI	<info@inovea-conseil.com>
- * Copyright (C) 2016-2018 Ferran Marcet        <fmarcet@2byte.es>
+ * Copyright (C) 2016-2022 Ferran Marcet        <fmarcet@2byte.es>
  * Copyright (C) 2021       Frédéric France     <frederic.france@netlogic.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -347,7 +347,7 @@ class Commande extends CommonOrder
 		'pos_source' =>array('type'=>'varchar(32)', 'label'=>'POSTerminal', 'enabled'=>1, 'visible'=>-1, 'position'=>280),
 		'fk_user_author' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>1, 'visible'=>-1, 'position'=>300),
 		'fk_user_modif' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>1, 'visible'=>-2, 'notnull'=>-1, 'position'=>302),
-		'date_creation' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>304),
+		'date_creation' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-2, 'position'=>304),
 		'tms' =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>306),
 		'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>400),
 		'fk_statut' =>array('type'=>'smallint(6)', 'label'=>'Status', 'enabled'=>1, 'visible'=>-1, 'position'=>500),
@@ -518,6 +518,7 @@ class Commande extends CommonOrder
 					if ($this->lines[$i]->fk_product > 0) {
 						$mouvP = new MouvementStock($this->db);
 						$mouvP->origin = &$this;
+						$mouvP->setOrigin($this->element, $this->id);
 						// We decrement stock of product (and sub-products)
 						$result = $mouvP->livraison($user, $this->lines[$i]->fk_product, $idwarehouse, $this->lines[$i]->qty, $this->lines[$i]->subprice, $langs->trans("OrderValidatedInDolibarr", $num));
 						if ($result < 0) {
@@ -645,6 +646,7 @@ class Commande extends CommonOrder
 					if ($this->lines[$i]->fk_product > 0) {
 						$mouvP = new MouvementStock($this->db);
 						$mouvP->origin = &$this;
+						$mouvP->setOrigin($this->element, $this->id);
 						// We increment stock of product (and sub-products)
 						$result = $mouvP->reception($user, $this->lines[$i]->fk_product, $idwarehouse, $this->lines[$i]->qty, 0, $langs->trans("OrderBackToDraftInDolibarr", $this->ref));
 						if ($result < 0) {
@@ -823,6 +825,7 @@ class Commande extends CommonOrder
 				for ($i = 0; $i < $num; $i++) {
 					if ($this->lines[$i]->fk_product > 0) {
 						$mouvP = new MouvementStock($this->db);
+						$mouvP->setOrigin($this->element, $this->id);
 						// We increment stock of product (and sub-products)
 						$result = $mouvP->reception($user, $this->lines[$i]->fk_product, $idwarehouse, $this->lines[$i]->qty, 0, $langs->trans("OrderCanceledInDolibarr", $this->ref)); // price is 0, we don't want WAP to be changed
 						if ($result < 0) {
@@ -872,7 +875,7 @@ class Commande extends CommonOrder
 	 */
 	public function create($user, $notrigger = 0)
 	{
-		global $conf, $langs;
+		global $conf, $langs, $mysoc;
 		$error = 0;
 
 		// Clean parameters
@@ -1039,7 +1042,8 @@ class Commande extends CommonOrder
 						$origintype,
 						$originid,
 						0,
-						$line->ref_ext
+						$line->ref_ext,
+						1
 					);
 					if ($result < 0) {
 						if ($result != self::STOCK_NOT_ENOUGH_FOR_ORDER) {
@@ -1055,6 +1059,8 @@ class Commande extends CommonOrder
 						$fk_parent_line = $result;
 					}
 				}
+
+				$result = $this->update_price(1, 'auto', 0, $mysoc); // This method is designed to add line from user input so total calculation must be done using 'auto' mode.
 
 				// update ref
 				$initialref = '(PROV'.$this->id.')';
@@ -1433,6 +1439,7 @@ class Commande extends CommonOrder
 	 *  @param		int			    $origin_id			Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be Id of origin object (aka line id), else object id
 	 * 	@param		double			$pu_ht_devise		Unit price in currency
 	 * 	@param		string			$ref_ext		    line external reference
+	 *  @param		int				$noupdateafterinsertline	No update after insert of line
 	 *	@return     int             					>0 if OK, <0 if KO
 	 *
 	 *	@see        add_product()
@@ -1442,7 +1449,7 @@ class Commande extends CommonOrder
 	 *	par l'appelant par la methode get_default_tva(societe_vendeuse,societe_acheteuse,produit)
 	 *	et le desc doit deja avoir la bonne valeur (a l'appelant de gerer le multilangue)
 	 */
-	public function addline($desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0, $txlocaltax2 = 0, $fk_product = 0, $remise_percent = 0, $info_bits = 0, $fk_remise_except = 0, $price_base_type = 'HT', $pu_ttc = 0, $date_start = '', $date_end = '', $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = null, $pa_ht = 0, $label = '', $array_options = 0, $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $ref_ext = '')
+	public function addline($desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0, $txlocaltax2 = 0, $fk_product = 0, $remise_percent = 0, $info_bits = 0, $fk_remise_except = 0, $price_base_type = 'HT', $pu_ttc = 0, $date_start = '', $date_end = '', $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = null, $pa_ht = 0, $label = '', $array_options = 0, $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $ref_ext = '', $noupdateafterinsertline = 0)
 	{
 		global $mysoc, $conf, $langs, $user;
 
@@ -1653,7 +1660,10 @@ class Commande extends CommonOrder
 				}
 
 				// Mise a jour informations denormalisees au niveau de la commande meme
-				$result = $this->update_price(1, 'auto', 0, $mysoc); // This method is designed to add line from user input so total calculation must be done using 'auto' mode.
+				if (empty($noupdateafterinsertline)) {
+					$result = $this->update_price(1, 'auto', 0, $mysoc); // This method is designed to add line from user input so total calculation must be done using 'auto' mode.
+				}
+
 				if ($result > 0) {
 					$this->db->commit();
 					return $this->line->id;

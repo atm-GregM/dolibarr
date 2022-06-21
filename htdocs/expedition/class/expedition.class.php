@@ -9,7 +9,7 @@
  * Copyright (C) 2014-2015  Marcos García           <marcosgdf@gmail.com>
  * Copyright (C) 2014-2017  Francis Appels          <francis.appels@yahoo.com>
  * Copyright (C) 2015       Claudio Aschieri        <c.aschieri@19.coop>
- * Copyright (C) 2016-2021	Ferran Marcet			<fmarcet@2byte.es>
+ * Copyright (C) 2016-2022	Ferran Marcet			<fmarcet@2byte.es>
  * Copyright (C) 2018       Nicolas ZABOURI			<info@inovea-conseil.com>
  * Copyright (C) 2018-2020  Frédéric France         <frederic.france@netlogic.fr>
  * Copyright (C) 2020       Lenin Rivas         	<lenin@leninrivas.com>
@@ -367,13 +367,15 @@ class Expedition extends CommonObject
 				// Insert of lines
 				$num = count($this->lines);
 				for ($i = 0; $i < $num; $i++) {
-					if (!isset($this->lines[$i]->detail_batch)) {	// no batch management
-						if ($this->create_line($this->lines[$i]->entrepot_id, $this->lines[$i]->origin_line_id, $this->lines[$i]->qty, $this->lines[$i]->rang, $this->lines[$i]->array_options) <= 0) {
-							$error++;
-						}
-					} else {	// with batch management
-						if ($this->create_line_batch($this->lines[$i], $this->lines[$i]->array_options) <= 0) {
-							$error++;
+					if (empty($this->lines[$i]->product_type) || !empty($conf->global->STOCK_SUPPORTS_SERVICES)) {
+						if (!isset($this->lines[$i]->detail_batch)) {	// no batch management
+							if ($this->create_line($this->lines[$i]->entrepot_id, $this->lines[$i]->origin_line_id, $this->lines[$i]->qty, $this->lines[$i]->rang, $this->lines[$i]->array_options) <= 0) {
+								$error++;
+							}
+						} else {	// with batch management
+							if ($this->create_line_batch($this->lines[$i], $this->lines[$i]->array_options) <= 0) {
+								$error++;
+							}
 						}
 					}
 				}
@@ -751,6 +753,7 @@ class Expedition extends CommonObject
 					//var_dump($this->lines[$i]);
 					$mouvS = new MouvementStock($this->db);
 					$mouvS->origin = dol_clone($this, 1);
+					$mouvS->setOrigin($this->element, $this->id);
 
 					if (empty($obj->edbrowid)) {
 						// line without batch detail
@@ -913,6 +916,7 @@ class Expedition extends CommonObject
 
 		// Copy the rang of the order line to the expedition line
 		$line->rang = $orderline->rang;
+		$line->product_type = $orderline->product_type;
 
 		if (!empty($conf->stock->enabled) && !empty($orderline->fk_product)) {
 			$fk_product = $orderline->fk_product;
@@ -965,6 +969,8 @@ class Expedition extends CommonObject
 		}
 
 		$this->lines[$num] = $line;
+
+		return 1;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
@@ -2228,6 +2234,7 @@ class Expedition extends CommonObject
 
 						$mouvS = new MouvementStock($this->db);
 						$mouvS->origin = &$this;
+						$mouvS->setOrigin($this->element, $this->id);
 
 						if (empty($obj->edbrowid)) {
 							// line without batch detail
@@ -2399,6 +2406,7 @@ class Expedition extends CommonObject
 						//var_dump($this->lines[$i]);
 						$mouvS = new MouvementStock($this->db);
 						$mouvS->origin = &$this;
+						$mouvS->setOrigin($this->element, $this->id);
 
 						if (empty($obj->edbrowid)) {
 							// line without batch detail
@@ -2602,6 +2610,12 @@ class ExpeditionLigne extends CommonObjectLine
 	 * @var string product description
 	 */
 	public $product_desc;
+
+	/**
+	 * Type of the product. 0 for product, 1 for service
+	 * @var int
+	 */
+	public $product_type = 0;
 
 	/**
 	 * @var int rang of line

@@ -701,7 +701,7 @@ if (empty($reshook) && $action == 'update') {
 				$categories = GETPOST('categories', 'array');
 				$object->setCategories($categories);
 
-				$object->loadReminders();
+				$object->loadReminders($remindertype, 0, false);
 				if (!empty($object->reminders) && $object->datep > dol_now()) {
 					foreach ($object->reminders as $reminder) {
 						$reminder->delete($user);
@@ -1237,7 +1237,7 @@ if ($action == 'create') {
 
 		print '<tr><td class="titlefieldcreate">'.$langs->trans("Project").'</td><td id="project-input-container">';
 		print img_picto('', 'project', 'class="pictofixedwidth"');
-		print $formproject->select_projects((empty($societe->id) ? '' : $societe->id), $projectid, 'projectid', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'maxwidth500 widthcentpercentminusxx');
+		print $formproject->select_projects(($object->socid > 0 ? $object->socid : -1), $projectid, 'projectid', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'maxwidth500 widthcentpercentminusxx');
 
 		print '&nbsp;<a href="'.DOL_URL_ROOT.'/projet/card.php?socid='.(empty($societe->id) ? '' : $societe->id).'&action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'">';
 		print '<span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddProject").'"></span></a>';
@@ -1491,6 +1491,10 @@ if ($id > 0) {
 	            		$("#fullday").change(function() {
 	            			setdatefields();
 	            		});
+	            		$("#actioncode").change(function() {
+                        	if ($("#actioncode").val() == \'AC_RDV\') $("#dateend").addClass("fieldrequired");
+                        	else $("#dateend").removeClass("fieldrequired");
+                    	});
                    })';
 			print '</script>'."\n";
 		}
@@ -1535,22 +1539,26 @@ if ($id > 0) {
 		print '<tr><td>'.$langs->trans("EventOnFullDay").'</td><td colspan="3"><input type="checkbox" id="fullday" name="fullday" '.($object->fulldayevent ? ' checked' : '').'></td></tr>';
 
 		// Date start - end
-		print '<tr><td class="nowrap"><span class="fieldrequired">'.$langs->trans("DateActionStart").' - '.$langs->trans("DateActionEnd").'</span></td><td colspan="3">';
+		print '<tr><td class="nowrap">';
+		print '<span class="fieldrequired">'.$langs->trans("DateActionStart").'</span>';
+		print ' - ';
+		print '<span id="dateend"'.($object->type_code == 'AC_RDV' ? ' class="fieldrequired"' : '').'>'.$langs->trans("DateActionEnd").'</span>';
+		print '</td><td td colspan="3">';
 		$tzforfullday = getDolGlobalString('MAIN_STORE_FULL_EVENT_IN_GMT');
 		if (GETPOST("afaire") == 1) {
-			print $form->selectDate($datep ? $datep : $object->datep, 'ap', 1, 1, 0, "action", 1, 1, 0, 'fulldaystart', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuser') : 'tzuser');
+			print $form->selectDate($datep ? $datep : $object->datep, 'ap', 1, 1, 0, "action", 1, 1, 0, 'fulldaystart', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuserrel') : 'tzuserrel');
 		} elseif (GETPOST("afaire") == 2) {
-			print $form->selectDate($datep ? $datep : $object->datep, 'ap', 1, 1, 1, "action", 1, 1, 0, 'fulldaystart', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuser') : 'tzuser');
+			print $form->selectDate($datep ? $datep : $object->datep, 'ap', 1, 1, 1, "action", 1, 1, 0, 'fulldaystart', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuserrel') : 'tzuserrel');
 		} else {
-			print $form->selectDate($datep ? $datep : $object->datep, 'ap', 1, 1, 1, "action", 1, 1, 0, 'fulldaystart', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuser') : 'tzuser');
+			print $form->selectDate($datep ? $datep : $object->datep, 'ap', 1, 1, 1, "action", 1, 1, 0, 'fulldaystart', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuserrel') : 'tzuserrel');
 		}
 		print ' - ';
 		if (GETPOST("afaire") == 1) {
-			print $form->selectDate($datef ? $datef : $object->datef, 'p2', 1, 1, 1, "action", 1, 1, 0, 'fulldayend', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuser') : 'tzuser');
+			print $form->selectDate($datef ? $datef : $object->datef, 'p2', 1, 1, 1, "action", 1, 1, 0, 'fulldayend', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuserrel') : 'tzuserrel');
 		} elseif (GETPOST("afaire") == 2) {
-			print $form->selectDate($datef ? $datef : $object->datef, 'p2', 1, 1, 1, "action", 1, 1, 0, 'fulldayend', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuser') : 'tzuser');
+			print $form->selectDate($datef ? $datef : $object->datef, 'p2', 1, 1, 1, "action", 1, 1, 0, 'fulldayend', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuserrel') : 'tzuserrel');
 		} else {
-			print $form->selectDate($datef ? $datef : $object->datef, 'p2', 1, 1, 1, "action", 1, 1, 0, 'fulldayend', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuser') : 'tzuser');
+			print $form->selectDate($datef ? $datef : $object->datef, 'p2', 1, 1, 1, "action", 1, 1, 0, 'fulldayend', '', '', '', 1, '', '', $object->fulldayevent ? ($tzforfullday ? $tzforfullday : 'tzuserrel') : 'tzuserrel');
 		}
 		print '</td></tr>';
 
@@ -1988,11 +1996,15 @@ if ($id > 0) {
 
 		// Date start
 		print '<tr><td>'.$langs->trans("DateActionStart").'</td><td>';
+		// Test a date before the 27 march and one after
+		//print dol_print_date($object->datep, 'dayhour', 'gmt');
+		//print dol_print_date($object->datep, 'dayhour', 'tzuser');
+		//print dol_print_date($object->datep, 'dayhour', 'tzuserrel');
 		if (empty($object->fulldayevent)) {
-			print dol_print_date($object->datep, 'dayhour', 'tzuser');
+			print dol_print_date($object->datep, 'dayhour', 'tzuserrel');
 		} else {
 			$tzforfullday = getDolGlobalString('MAIN_STORE_FULL_EVENT_IN_GMT');
-			print dol_print_date($object->datep, 'day', ($tzforfullday ? $tzforfullday : 'tzuser'));
+			print dol_print_date($object->datep, 'day', ($tzforfullday ? $tzforfullday : 'tzuserrel'));
 		}
 		if ($object->percentage == 0 && $object->datep && $object->datep < ($now - $delay_warning)) {
 			print img_warning($langs->trans("Late"));
@@ -2003,10 +2015,10 @@ if ($id > 0) {
 		// Date end
 		print '<tr><td>'.$langs->trans("DateActionEnd").'</td><td>';
 		if (empty($object->fulldayevent)) {
-			print dol_print_date($object->datef, 'dayhour', 'tzuser');
+			print dol_print_date($object->datef, 'dayhour', 'tzuserrel');
 		} else {
 			$tzforfullday = getDolGlobalString('MAIN_STORE_FULL_EVENT_IN_GMT');
-			print dol_print_date($object->datef, 'day', ($tzforfullday ? $tzforfullday : 'tzuser'));
+			print dol_print_date($object->datef, 'day', ($tzforfullday ? $tzforfullday : 'tzuserrel'));
 		}
 		if ($object->percentage > 0 && $object->percentage < 100 && $object->datef && $object->datef < ($now - $delay_warning)) {
 			print img_warning($langs->trans("Late"));

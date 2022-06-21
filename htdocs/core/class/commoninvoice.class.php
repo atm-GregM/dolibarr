@@ -820,15 +820,17 @@ abstract class CommonInvoice extends CommonObject
 	 */
 	public function buildZATCAQRString()
 	{
-		global $conf;
+		global $conf, $mysoc;
 
 		$tmplang = new Translate('', $conf);
 		$tmplang->setDefaultLang('en_US');
 		$tmplang->load("main");
 
 		$datestring = dol_print_date($this->date, 'dayhourrfc');
-		$pricewithtaxstring = price($this->total_ttc, 0, $tmplang, 0, -1, 2);
-		$pricetaxstring = price($this->total_tva, 0, $tmplang, 0, -1, 2);
+		//$pricewithtaxstring = price($this->total_ttc, 0, $tmplang, 0, -1, 2);
+		//$pricetaxstring = price($this->total_tva, 0, $tmplang, 0, -1, 2);
+		$pricewithtaxstring = price2num($this->total_ttc, 2, 1);
+		$pricetaxstring = price2num($this->total_tva, 2, 1);
 
 		/*
 		$name = implode(unpack("H*", $this->thirdparty->name));
@@ -855,9 +857,9 @@ abstract class CommonInvoice extends CommonObject
 		*/
 
 		// Using TLV format
-		$s = pack('C1', 1).pack('C1', strlen($this->thirdparty->name)).$this->thirdparty->name;
-		$s .= pack('C1', 2).pack('C1', strlen($this->thirdparty->tva_intra)).$this->thirdparty->tva_intra;
-		$s .= pack('C1', 3).pack('C1', strlen($datestring)).$this->date;
+		$s = pack('C1', 1).pack('C1', strlen($mysoc->name)).$mysoc->name;
+		$s .= pack('C1', 2).pack('C1', strlen($mysoc->tva_intra)).$mysoc->tva_intra;
+		$s .= pack('C1', 3).pack('C1', strlen($datestring)).$datestring;
 		$s .= pack('C1', 4).pack('C1', strlen($pricewithtaxstring)).$pricewithtaxstring;
 		$s .= pack('C1', 5).pack('C1', strlen($pricetaxstring)).$pricetaxstring;
 		$s .= '';					// Hash of xml invoice
