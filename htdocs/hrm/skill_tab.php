@@ -226,6 +226,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	// Get all available skills
 	$static_skill = new Skill($db);
 	$TAllSkills = $static_skill->fetchAll();
+	$newToken = function_exists('newToken') ? newToken() : $_SESSION['newtoken'];
 
 	// Array format for multiselectarray function
 	$TAllSkillsFormatted=array();
@@ -314,6 +315,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if ($objecttype != 'user' && $permissiontoadd) {
 		// form pour ajouter des compétences
 		print '<form name="addSkill" method="post" action="' . $_SERVER['PHP_SELF'] . '">';
+		print '<input type="hidden" name="token" value="'.$newToken.'">';
 		print '<input type="hidden" name="objecttype" value="' . $objecttype . '">';
 		print '<input type="hidden" name="id" value="' . $id . '">';
 		print '<input type="hidden" name="action" value="addSkill">';
@@ -354,6 +356,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<tr><td><span class="opacitymedium">' . $langs->trans("NoRecordFound") . '</span></td></tr>';
 	} else {
 		$sk = new Skill($db);
+		print '<input type="hidden" name="token" value="'.$newToken.'">';
 		foreach ($TSkillsJob as $skillElement) {
 			$sk->fetch($skillElement->fk_skill);
 			print '<tr>';

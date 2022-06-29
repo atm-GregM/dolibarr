@@ -122,14 +122,11 @@ if (empty($reshook)) {
 	$triggermodname = 'hrm_SKILL_MODIFY'; // Name of trigger action code to execute when we modify record
 
 
-	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
-	include DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
-
+	//Afin d'éviter le redirection de l'include addupdatedelete
 	// action update on Skilldet
 
 	$skilldetArray = GETPOST("descriptionline", "array");
-
-	if (!$error) {
+	if ($action == 'update') {
 		if (is_array($skilldetArray) && count($skilldetArray) > 0) {
 			foreach ($skilldetArray as $key => $SkValueToUpdate) {
 				$skilldetObj = new Skilldet($object->db);
@@ -145,6 +142,8 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
+	include DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
 	// Actions when linking object each other
 	include DOL_DOCUMENT_ROOT . '/core/actions_dellink.inc.php';
@@ -279,6 +278,7 @@ if (($id || $ref) && $action == 'edit') {
 
 			print '<table class="border centpercent =">' . "\n";
 			$sk->fields = dol_sort_array($sk->fields, 'position');
+			//var_dump($sk);exit;
 			foreach ($sk->fields as $key => $val) {
 				if (abs($val['visible']) != 1 && abs($val['visible']) != 3 && abs($val['visible']) != 4) {
 					continue;
@@ -322,6 +322,8 @@ if (($id || $ref) && $action == 'edit') {
 					$skilldetArray = GETPOST("descriptionline", "array");
 				if (empty($skilldetArray)) {
 					$value = GETPOSTISSET($key) ? GETPOST($key, $check) : $sk->$key;
+					//var_dump($skilldetArray,  $value);exit;
+
 				} else {
 					$value=$skilldetArray[$sk->id];
 				}
