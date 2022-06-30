@@ -2552,8 +2552,8 @@ if ($action == 'create') {
 
 
 		// Show links to link elements
-		//$linktoelem = $form->showLinkToObjectBlock($object, null, array('order'));
-		$somethingshown = $form->showLinkedObjectBlock($object, '');
+		$linktoelem = $form->showLinkToObjectBlock($object, null, array('shipping'));
+		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
 
 
 		print '</div><div class="fichehalfright">';
