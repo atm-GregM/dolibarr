@@ -2118,6 +2118,24 @@ if ($action == 'create') {
 	}
 	print '</td>';
 
+	// Date of signature
+
+	print '<tr>';
+	print '<td>';
+	print $langs->trans('DateOfSignature');
+	print '</td>';
+	print '<td>';
+
+	if ($object->date_signature) {
+		print dol_print_date($object->date_signature, 'day');
+	} else {
+		print '&nbsp;';
+	}
+
+
+	print '</td>';
+	print '</tr>';
+
 	// Date end proposal
 	print '<tr>';
 	print '<td>';

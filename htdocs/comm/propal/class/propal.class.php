@@ -297,6 +297,7 @@ class Propal extends CommonObject
 		'tms' =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>25),
 		'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
 		'datep' =>array('type'=>'date', 'label'=>'Date', 'enabled'=>1, 'visible'=>-1, 'position'=>60),
+		'date_signature' =>array('type'=>'date', 'label'=>'DateSignature', 'enabled'=>1, 'visible'=>1, 'position'=>61),
 		'fin_validite' =>array('type'=>'datetime', 'label'=>'DateEnd', 'enabled'=>1, 'visible'=>-1, 'position'=>65),
 		'date_valid' =>array('type'=>'datetime', 'label'=>'DateValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>70),
 		'date_cloture' =>array('type'=>'datetime', 'label'=>'DateClosing', 'enabled'=>1, 'visible'=>-1, 'position'=>75),
