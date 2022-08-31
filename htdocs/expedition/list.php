@@ -926,6 +926,15 @@ while ($i < min($num, $limit)) {
 		print dol_print_date($db->jdate($obj->delivery_date), "dayhour");
 		print "</td>\n";
 	}
+	// Montant HT
+	if (!empty($arrayfields['montantHT']['checked'])) {
+		print '<td class="nocellnopadd center" >';
+		print price($obj->montantHT);
+		print '</td>';
+		if (!$i) {
+			$totalarray['nbfield']++;
+		}
+	}
 	if (!empty($arrayfields['e.fk_shipping_method']['checked'])) {
 		// Get code using getLabelFromKey
 		$code=$langs->getLabelFromKey($db, $shipment->shipping_method_id, 'c_shipment_mode', 'rowid', 'code');
@@ -984,15 +993,6 @@ while ($i < min($num, $limit)) {
 	if (!empty($arrayfields['e.tms']['checked'])) {
 		print '<td class="center nowrap">';
 		print dol_print_date($db->jdate($obj->date_update), 'dayhour', 'tzuser');
-		print '</td>';
-		if (!$i) {
-			$totalarray['nbfield']++;
-		}
-	}
-	// Montant HT
-	if (!empty($arrayfields['montantHT']['checked'])) {
-		print '<td class="nocellnopadd center" >';
-		print price($obj->montantHT);
 		print '</td>';
 		if (!$i) {
 			$totalarray['nbfield']++;
