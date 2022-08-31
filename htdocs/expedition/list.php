@@ -990,9 +990,9 @@ while ($i < min($num, $limit)) {
 		}
 	}
 	// Montant HT
-	if (!empty($arrayfields['MontantHT']['checked'])) {
+	if (!empty($arrayfields['montantHT']['checked'])) {
 		print '<td class="nocellnopadd center" >';
-		print price($obj->MontantHT);
+		print price($obj->montantHT);
 		print '</td>';
 		if (!$i) {
 			$totalarray['nbfield']++;
