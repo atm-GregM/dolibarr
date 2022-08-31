@@ -394,7 +394,7 @@ if(! empty($search_montant_ht)) {
 	if(! empty($hookmanager->resPrint)) $sql .= natural_search('montantHT', $search_montant_ht, 1);
 	else {
 		$sql .= ' HAVING 1 = 1 ';
-		$sql .= natural_search('MontantHT', $search_montant_ht, 1);
+		$sql .= natural_search('montantHT', $search_montant_ht, 1);
 	}
 }
 
