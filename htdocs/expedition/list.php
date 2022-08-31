@@ -779,8 +779,8 @@ if (!empty($arrayfields['e.fk_shipping_method']['checked'])) {
 if (!empty($arrayfields['e.tracking_number']['checked'])) {
 	print_liste_field_titre($arrayfields['e.tracking_number']['label'], $_SERVER["PHP_SELF"], "e.tracking_number", "", $param, '', $sortfield, $sortorder, 'center ');
 }
-if(! empty($arrayfields['MontantHT']['checked'])) {
-	print_liste_field_titre($arrayfields['MontantHT']['label'], $_SERVER['PHP_SELF'], 'MontantHT', '', $param, '', $sortfield, $sortorder, 'center ');
+if(! empty($arrayfields['montantHT']['checked'])) {
+	print_liste_field_titre($arrayfields['montantHT']['label'], $_SERVER['PHP_SELF'], 'MontantHT', '', $param, '', $sortfield, $sortorder, 'center ');
 }
 if (!empty($arrayfields['l.ref']['checked'])) {
 	print_liste_field_titre($arrayfields['l.ref']['label'], $_SERVER["PHP_SELF"], "l.ref", "", $param, '', $sortfield, $sortorder);
