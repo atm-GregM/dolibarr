@@ -684,7 +684,7 @@ if (!empty($arrayfields['e.tracking_number']['checked'])) {
 	print '</td>';
 }
 // Montant HT
-if (!empty($arrayfields['MontantHT']['checked'])) {
+if (!empty($arrayfields['montantHT']['checked'])) {
 	print '<td class="liste_titre" align="center">';
 	print '<input class="flat" size="4" type="text" name="search_montant_ht" value="'.dol_escape_htmltag($search_montant_ht).'">';
 	print '</td>';
