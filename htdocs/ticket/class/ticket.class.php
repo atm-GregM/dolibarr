@@ -1665,6 +1665,7 @@ class Ticket extends CommonObject
 	{
 		global $conf, $langs;
 		$error = 0;
+		$send_email = GETPOST('send_email','int');
 
 		$now = dol_now();
 
@@ -1687,6 +1688,10 @@ class Ticket extends CommonObject
 		if ($this->private) {
 			$actioncomm->code = 'TICKET_MSG_PRIVATE';
 		}
+		if ($send_email > 0){
+			$actioncomm->type_code = 'AC_EMAIL';
+		}
+
 		$actioncomm->socid = $this->socid;
 		$actioncomm->label = $this->subject;
 		$actioncomm->note_private = $this->message;
