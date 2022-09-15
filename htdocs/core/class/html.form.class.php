@@ -8436,7 +8436,7 @@ class Form
 
 			$possiblelinks = array(
 				'propal'=>array('enabled'=>$conf->propal->enabled, 'perms'=>1, 'label'=>'LinkToProposal', 'sql'=>"SELECT s.rowid as socid, s.nom as name, s.client, t.rowid, t.ref, t.ref_client, t.total_ht FROM ".MAIN_DB_PREFIX."societe as s, ".MAIN_DB_PREFIX."propal as t WHERE t.fk_soc = s.rowid AND t.fk_soc IN (".$this->db->sanitize($listofidcompanytoscan).') AND t.entity IN ('.getEntity('propal').')'),
-				'shipping'=>array('enabled'=>$conf->expedition->enabled, 'perms'=>1, 'label'=>'LinkToExpedition', 'sql'=>"SELECT s.rowid as socid, s.nom as name, s.client, t.rowid, t.ref FROM ".MAIN_DB_PREFIX."societe as s, ".MAIN_DB_PREFIX."expedition as t WHERE t.fk_soc = s.rowid AND t.fk_soc IN (".$this->db->sanitize($listofidcompanytoscan).') AND t.entity IN ('.getEntity('shipping').')'),
+				'shipping'=>array('enabled'=>$conf->expedition->enabled, 'perms'=>1, 'label'=>'LinkToExpedition', 'sql'=>"SELECT s.rowid as socid, s.nom as name, s.client, t.rowid, t.ref, SUM(pd.subprice*ed.qty) as montantHT FROM ".$this->db->prefix()."societe as s, ".$this->db->prefix()."expedition as t LEFT JOIN ".MAIN_DB_PREFIX."expeditiondet as ed ON t.rowid = ed.fk_expedition LEFT JOIN ".MAIN_DB_PREFIX."commandedet as pd ON pd.rowid = ed.fk_origin_line WHERE t.fk_soc = s.rowid AND t.fk_soc IN (".$this->db->sanitize($listofidcompanytoscan).') AND t.entity IN ('.getEntity('shipping').')GROUP BY t.rowid'),
 				'order'=>array('enabled'=>$conf->commande->enabled, 'perms'=>1, 'label'=>'LinkToOrder', 'sql'=>"SELECT s.rowid as socid, s.nom as name, s.client, t.rowid, t.ref, t.ref_client, t.total_ht FROM ".MAIN_DB_PREFIX."societe as s, ".MAIN_DB_PREFIX."commande as t WHERE t.fk_soc = s.rowid AND t.fk_soc IN (".$this->db->sanitize($listofidcompanytoscan).') AND t.entity IN ('.getEntity('commande').')'),
 				'invoice'=>array('enabled'=>$conf->facture->enabled, 'perms'=>1, 'label'=>'LinkToInvoice', 'sql'=>"SELECT s.rowid as socid, s.nom as name, s.client, t.rowid, t.ref, t.ref_client, t.total_ht FROM ".MAIN_DB_PREFIX."societe as s, ".MAIN_DB_PREFIX."facture as t WHERE t.fk_soc = s.rowid AND t.fk_soc IN (".$this->db->sanitize($listofidcompanytoscan).') AND t.entity IN ('.getEntity('invoice').')'),
 				'invoice_template'=>array('enabled'=>$conf->facture->enabled, 'perms'=>1, 'label'=>'LinkToTemplateInvoice', 'sql'=>"SELECT s.rowid as socid, s.nom as name, s.client, t.rowid, t.titre as ref, t.total_ht FROM ".MAIN_DB_PREFIX."societe as s, ".MAIN_DB_PREFIX."facture_rec as t WHERE t.fk_soc = s.rowid AND t.fk_soc IN (".$this->db->sanitize($listofidcompanytoscan).') AND t.entity IN ('.getEntity('invoice').')'),
@@ -8532,7 +8532,7 @@ class Form
 							$form = new Form($this->db);
 							print $form->textwithpicto('', $langs->trans("InformationOnLinkToContract")).' ';
 						}
-						print '<span class="amount">'.price($objp->total_ht).'</span>';
+						print '<span class="amount">'.price($objp->montantHT).'</span>';
 						print '</td>';
 						print '<td>'.$objp->name.'</td>';
 						print '</tr>';
