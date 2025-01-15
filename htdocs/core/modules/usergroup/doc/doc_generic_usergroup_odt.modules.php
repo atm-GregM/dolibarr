@@ -102,7 +102,7 @@ class doc_generic_usergroup_odt extends ModelePDFUserGroup
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *	@return string       			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs;
 

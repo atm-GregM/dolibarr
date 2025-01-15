@@ -393,7 +393,7 @@ class doc_generic_project_odt extends ModelePDFProjects
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *	@return string       			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs;
 

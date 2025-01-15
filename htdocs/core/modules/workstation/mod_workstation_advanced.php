@@ -59,7 +59,7 @@ class mod_workstation_advanced extends ModeleNumRefWorkstation
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $langs, $db;
 

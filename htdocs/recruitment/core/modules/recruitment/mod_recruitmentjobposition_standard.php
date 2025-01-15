@@ -60,7 +60,7 @@ class mod_recruitmentjobposition_standard extends ModeleNumRefRecruitmentJobPosi
 	 *	@param		Translate	$langs		Language
 	 *  @return     string      Text with description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		return $langs->trans("SimpleNumRefModelDesc", $this->prefix);
 	}
@@ -84,7 +84,7 @@ class mod_recruitmentjobposition_standard extends ModeleNumRefRecruitmentJobPosi
 	 *  @param  CommonObject	$object	Object we need next value for
 	 *  @return boolean     			false if conflict, true if ok
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated(Object $object): bool
 	{
 		global $conf, $langs, $db;
 

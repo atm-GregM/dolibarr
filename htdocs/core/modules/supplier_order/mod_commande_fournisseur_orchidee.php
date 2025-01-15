@@ -64,7 +64,7 @@ class mod_commande_fournisseur_orchidee extends ModeleNumRefSuppliersOrders
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $db, $langs;
 

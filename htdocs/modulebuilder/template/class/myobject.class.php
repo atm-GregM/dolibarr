@@ -280,7 +280,7 @@ class MyObject extends CommonObject
 	 * @param	int<0,1> 	$notrigger	0=launch triggers after, 1=disable triggers
 	 * @return	int<-1,max>				Return integer <0 if KO, Id of created object if OK
 	 */
-	public function create(User $user, $notrigger = 0)
+	public function create(User $user, int $notrigger = 0): int
 	{
 		$resultcreate = $this->createCommon($user, $notrigger);
 
@@ -298,7 +298,7 @@ class MyObject extends CommonObject
 	 * @param	int 	$fromid		Id of object to clone
 	 * @return	self|int<-1,-1>		New object created, <0 if KO
 	 */
-	public function createFromClone(User $user, $fromid)
+	public function createFromClone(User $user, int $fromid)
 	{
 		global $langs, $extrafields;
 		$error = 0;
@@ -399,7 +399,7 @@ class MyObject extends CommonObject
 	 * @param	int<0,1>	$nolines		0=Default to load extrafields, 1=No extrafields
 	 * @return	int<-1,1>					Return integer <0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetch($id, $ref = null, $noextrafields = 0, $nolines = 0)
+	public function fetch(int $id, string $ref = null, int $noextrafields = 0, int $nolines = 0): int
 	{
 		$result = $this->fetchCommon($id, $ref, '', $noextrafields);
 		if ($result > 0 && !empty($this->table_element_line) && empty($nolines)) {
@@ -414,7 +414,7 @@ class MyObject extends CommonObject
 	 * @param	int<0,1>	$noextrafields	0=Default to load extrafields, 1=No extrafields
 	 * @return 	int<-1,1>					Return integer <0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetchLines($noextrafields = 0)
+	public function fetchLines(int $noextrafields = 0): int
 	{
 		$this->lines = array();
 
@@ -437,7 +437,7 @@ class MyObject extends CommonObject
 	 * @param	string		$filtermode	No longer used
 	 * @return	array<int,self>|int<-1,-1>	 <0 if KO, array of pages if OK
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 1000, $offset = 0, string $filter = '', $filtermode = 'AND')
+	public function fetchAll(string $sortorder = '',string $sortfield = '',int $limit = 1000,int $offset = 0, string $filter = '',string $filtermode = 'AND')
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -507,7 +507,7 @@ class MyObject extends CommonObject
 	 * @param	int<0,1>	$notrigger	0=launch triggers after, 1=disable triggers
 	 * @return	int<-1,1>				Return integer <0 if KO, >0 if OK
 	 */
-	public function update(User $user, $notrigger = 0)
+	public function update(User $user,int $notrigger = 0): int
 	{
 		return $this->updateCommon($user, $notrigger);
 	}
@@ -519,7 +519,7 @@ class MyObject extends CommonObject
 	 * @param	int<0,1> 	$notrigger	0=launch triggers, 1=disable triggers
 	 * @return	int<-1,1>				Return integer <0 if KO, >0 if OK
 	 */
-	public function delete(User $user, $notrigger = 0)
+	public function delete(User $user,int $notrigger = 0): int
 	{
 		return $this->deleteCommon($user, $notrigger);
 		//return $this->deleteCommon($user, $notrigger, 1);
@@ -533,7 +533,7 @@ class MyObject extends CommonObject
 	 *  @param	int<0,1>	$notrigger	0=launch triggers after, 1=disable triggers
 	 *  @return	int<-2,1>				>0 if OK, <0 if KO
 	 */
-	public function deleteLine(User $user, $idline, $notrigger = 0)
+	public function deleteLine(User $user,int $idline,int $notrigger = 0): int
 	{
 		if ($this->status < 0) {
 			$this->error = 'ErrorDeleteLineNotAllowedByObjectStatus';
@@ -551,7 +551,7 @@ class MyObject extends CommonObject
 	 *  @param	int<0,1>	$notrigger	1=Does not execute triggers, 0= execute triggers
 	 *	@return	int<-1,1>				Return integer <=0 if OK, 0=Nothing done, >0 if KO
 	 */
-	public function validate($user, $notrigger = 0)
+	public function validate(User $user,int $notrigger = 0): int
 	{
 		global $conf;
 
@@ -687,7 +687,7 @@ class MyObject extends CommonObject
 	 *  @param	int<0,1>	$notrigger	1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int<0,1>				Return integer <0 if KO, >0 if OK
 	 */
-	public function setDraft($user, $notrigger = 0)
+	public function setDraft(User $user,int $notrigger = 0): int
 	{
 		// Protection
 		if ($this->status <= self::STATUS_DRAFT) {
@@ -711,7 +711,7 @@ class MyObject extends CommonObject
 	 *  @param	int<0,1>	$notrigger	1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int<-1,1>				Return integer <0 if KO, 0=Nothing done, >0 if OK
 	 */
-	public function cancel($user, $notrigger = 0)
+	public function cancel(User $user,int $notrigger = 0): int
 	{
 		// Protection
 		if ($this->status != self::STATUS_VALIDATED) {
@@ -735,7 +735,7 @@ class MyObject extends CommonObject
 	 *  @param	int<0,1>	$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int<-1,1>					Return integer <0 if KO, 0=Nothing done, >0 if OK
 	 */
-	public function reopen($user, $notrigger = 0)
+	public function reopen(User $user,int $notrigger = 0): int
 	{
 		// Protection
 		if ($this->status == self::STATUS_VALIDATED) {
@@ -759,7 +759,7 @@ class MyObject extends CommonObject
 	 * @since 	v18
 	 * @return	array{optimize?:string,picto?:string,ref?:string}
 	 */
-	public function getTooltipContentArray($params)
+	public function getTooltipContentArray(mixed $params): array
 	{
 		global $langs;
 
@@ -792,7 +792,7 @@ class MyObject extends CommonObject
 	 *  @param	int     $save_lastsearch_value      -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 *  @return	string                              String with URL
 	 */
-	public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
+	public function getNomUrl(int $withpicto = 0,string $option = '',int $notooltip = 0,string $morecss = '',int $save_lastsearch_value = -1): string
 	{
 		global $conf, $langs, $hookmanager;
 
@@ -911,7 +911,7 @@ class MyObject extends CommonObject
 	 *  @param	?array<string,string>	$arraydata	Array of data
 	 *  @return	string								HTML Code for Kanban thumb.
 	 */
-	public function getKanbanView($option = '', $arraydata = null)
+	public function getKanbanView(string $option = '',mixed $arraydata = null): string
 	{
 		global $conf, $langs;
 
@@ -953,7 +953,7 @@ class MyObject extends CommonObject
 	 *  @param	int<0,6>	$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
 	 *  @return	string 			       Label of status
 	 */
-	public function getLabelStatus($mode = 0)
+	public function getLabelStatus(int $mode = 0): string
 	{
 		return $this->LibStatut($this->status, $mode);
 	}
@@ -964,7 +964,7 @@ class MyObject extends CommonObject
 	 *  @param	int<0,6>	$mode	0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
 	 *  @return	string				Label of status
 	 */
-	public function getLibStatut($mode = 0)
+	public function getLibStatut(int $mode = 0): string
 	{
 		return $this->LibStatut($this->status, $mode);
 	}
@@ -977,7 +977,7 @@ class MyObject extends CommonObject
 	 *  @param	int<0,6>	$mode		0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
 	 *  @return	string					Label of status
 	 */
-	public function LibStatut($status, $mode = 0)
+	public function LibStatut(int $status,int $mode = 0): string
 	{
 		// phpcs:enable
 		if (is_null($status)) {
@@ -1010,7 +1010,7 @@ class MyObject extends CommonObject
 	 *	@param	int		$id       Id of object
 	 *	@return	void
 	 */
-	public function info($id)
+	public function info(int $id): void
 	{
 		$sql = "SELECT rowid,";
 		$sql .= " date_creation as datec, tms as datem";
@@ -1064,7 +1064,7 @@ class MyObject extends CommonObject
 	 *
 	 * @return	int
 	 */
-	public function initAsSpecimen()
+	public function initAsSpecimen(): int
 	{
 		// Set here init that are not commonf fields
 		// $this->property1 = ...
@@ -1099,7 +1099,7 @@ class MyObject extends CommonObject
 	 *
 	 *  @return	string      		Object free reference
 	 */
-	public function getNextNumRef()
+	public function getNextNumRef(): string
 	{
 		global $langs, $conf;
 		$langs->load("mymodule@mymodule");
@@ -1161,7 +1161,7 @@ class MyObject extends CommonObject
 	 *  @param	?array<string,string>  $moreparams     Array to provide more information
 	 *  @return	int         				0 if KO, 1 if OK
 	 */
-	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
+	public function generateDocument(string $modele,Translate $outputlangs,int $hidedetails = 0,int $hidedesc = 0,int $hideref = 0,mixed $moreparams = null): int
 	{
 		global $langs;
 
@@ -1198,7 +1198,7 @@ class MyObject extends CommonObject
 	 * @param	string  $fieldValue          value of attribute
 	 * @return	bool 						Return false if fail, true on success, set $this->error for error message
 	 */
-	public function validateField($fields, $fieldKey, $fieldValue)
+	public function validateField(mixed $fields,mixed $fieldKey,mixed $fieldValue): bool
 	{
 		// Add your own validation rules here.
 		// ...
@@ -1213,7 +1213,7 @@ class MyObject extends CommonObject
 	 *
 	 * @return	int			0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
 	 */
-	public function doScheduledJob()
+	public function doScheduledJob(): int
 	{
 		//global $conf, $langs;
 

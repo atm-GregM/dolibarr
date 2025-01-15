@@ -103,7 +103,7 @@ class doc_generic_mo_odt extends ModelePDFMo
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *	@return string       			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs;
 

@@ -62,7 +62,7 @@ class mod_task_universal extends ModeleNumRefTask
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $langs, $db;
 

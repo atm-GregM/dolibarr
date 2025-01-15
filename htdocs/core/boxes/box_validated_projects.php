@@ -73,7 +73,7 @@ class box_validated_projects extends ModeleBoxes
 	 *  @param   int		$max        Maximum number of records to load
 	 *  @return  void
 	 */
-	public function loadBox($max = 5)
+	public function loadBox(int $max = 5): void
 	{
 		global $conf, $user, $langs;
 

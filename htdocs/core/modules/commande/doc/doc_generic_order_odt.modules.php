@@ -104,7 +104,7 @@ class doc_generic_order_odt extends ModelePDFCommandes
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *	@return string       			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs;
 

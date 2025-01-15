@@ -27,7 +27,7 @@
  * @param	MyObject	$object					MyObject
  * @return 	array<array{string,string,string}>	Array of tabs
  */
-function myobjectPrepareHead($object)
+function myobjectPrepareHead($object): array
 {
 	global $db, $langs, $conf;
 

@@ -75,7 +75,7 @@ class MyModuleApi extends DolibarrApi
 	 * @throws RestException 403 Not allowed
 	 * @throws RestException 404 Not found
 	 */
-	public function get($id)
+	public function get(int $id)
 	{
 		if (!DolibarrApiAccess::$user->hasRight('mymodule', 'myobject', 'read')) {
 			throw new RestException(403);
@@ -113,7 +113,7 @@ class MyModuleApi extends DolibarrApi
 	 *
 	 * @url	GET /myobjects/
 	 */
-	public function index($sortfield = "t.rowid", $sortorder = 'ASC', $limit = 100, $page = 0, $sqlfilters = '', $properties = '')
+	public function index(string $sortfield = "t.rowid",string $sortorder = 'ASC',int $limit = 100,int $page = 0,string $sqlfilters = '',string $properties = ''): array
 	{
 		$obj_ret = array();
 		$tmpobject = new MyObject($this->db);
@@ -203,7 +203,7 @@ class MyModuleApi extends DolibarrApi
 	 *
 	 * @url	POST myobjects/
 	 */
-	public function post($request_data = null)
+	public function post(array $request_data = null): int
 	{
 		if (!DolibarrApiAccess::$user->hasRight('mymodule', 'myobject', 'write')) {
 			throw new RestException(403);
@@ -257,7 +257,7 @@ class MyModuleApi extends DolibarrApi
 	 *
 	 * @url	PUT myobjects/{id}
 	 */
-	public function put($id, $request_data = null)
+	public function put(int $id,array $request_data = null)
 	{
 		if (!DolibarrApiAccess::$user->hasRight('mymodule', 'myobject', 'write')) {
 			throw new RestException(403);
@@ -316,7 +316,7 @@ class MyModuleApi extends DolibarrApi
 	 *
 	 * @url	DELETE myobjects/{id}
 	 */
-	public function delete($id)
+	public function delete(int $id): array
 	{
 		if (!DolibarrApiAccess::$user->hasRight('mymodule', 'myobject', 'delete')) {
 			throw new RestException(403);
@@ -357,7 +357,7 @@ class MyModuleApi extends DolibarrApi
 	 *
 	 * @throws	RestException
 	 */
-	private function _validateMyObject($data)
+	private function _validateMyObject(array $data): array
 	{
 		$myobject = array();
 		foreach ($this->myobject->fields as $field => $propfield) {

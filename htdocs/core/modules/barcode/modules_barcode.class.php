@@ -57,7 +57,7 @@ abstract class ModeleBarCode
 	 *  @param  Translate   $langs      Lang object to use for output
 	 *  @return string                  Descriptive text
 	 */
-	abstract public function info($langs);
+	abstract public function info(Translate $langs): string;
 
 
 	/**

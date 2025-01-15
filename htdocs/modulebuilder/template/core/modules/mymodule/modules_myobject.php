@@ -47,7 +47,7 @@ abstract class ModelePDFMyObject extends CommonDocGenerator
 	 *  @param  int<0,max>	$maxfilenamelength  Max length of value to show
 	 *  @return string[]|int<-1,0>				List of templates
 	 */
-	public static function liste_modeles($db, $maxfilenamelength = 0)
+	public static function liste_modeles(DoliDB $db,int $maxfilenamelength = 0): array
 	{
 		// phpcs:enable
 		$type = 'myobject';
@@ -71,7 +71,7 @@ abstract class ModelePDFMyObject extends CommonDocGenerator
 	 *	@param	int<0,1>			$hideref			Do not show ref
 	 *	@return	int<-1,1>								1 if OK, <=0 if KO
 	 */
-	abstract public function write_file($object, $outputlangs, $srctemplatepath = '', $hidedetails = 0, $hidedesc = 0, $hideref = 0);
+	abstract public function write_file(MyObject $object,Translate $outputlangs,string $srctemplatepath = '',int $hidedetails = 0,int $hidedesc = 0,int $hideref = 0): int;
 }
 
 
@@ -85,7 +85,7 @@ abstract class ModeleNumRefMyObject extends CommonNumRefGenerator
 	 *
 	 *  @return     string      Example
 	 */
-	abstract public function getExample();
+	abstract public function getExample(): string;
 
 	/**
 	 * 	Return next free value
@@ -93,5 +93,5 @@ abstract class ModeleNumRefMyObject extends CommonNumRefGenerator
 	 *  @param  MyObject		$object		Object we need next value for
 	 *  @return string|int<-1,0>			Next value if OK, <=0 if KO
 	 */
-	abstract public function getNextValue($object);
+	abstract public function getNextValue(MyObject $object);
 }

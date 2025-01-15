@@ -64,7 +64,7 @@ class mod_arctic extends ModeleNumRefFicheinter
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $db, $langs;
 

@@ -63,7 +63,7 @@ class mod_codeproduct_leopard extends ModeleProductCode
 	 *  @param	Translate	$langs	Object langs
 	 *  @return string      		Description of module
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		$langs->load("companies");
 		return $langs->trans("LeopardNumRefModelDesc");

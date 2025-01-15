@@ -26,7 +26,7 @@
  *
  * @return array<array{string,string,string}>
  */
-function mymoduleAdminPrepareHead()
+function mymoduleAdminPrepareHead(): array
 {
 	global $langs, $conf;
 

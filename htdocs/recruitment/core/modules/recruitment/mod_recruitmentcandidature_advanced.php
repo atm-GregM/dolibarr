@@ -58,7 +58,7 @@ class mod_recruitmentcandidature_advanced extends ModeleNumRefRecruitmentCandida
 	 *	@param		Translate	$langs		Language
 	 *  @return     string      Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $db;
 

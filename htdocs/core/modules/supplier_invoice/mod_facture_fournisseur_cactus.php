@@ -80,7 +80,7 @@ class mod_facture_fournisseur_cactus extends ModeleNumRefSuppliersInvoices
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $langs;
 		$langs->load("bills");
@@ -105,7 +105,7 @@ class mod_facture_fournisseur_cactus extends ModeleNumRefSuppliersInvoices
 	 *	@param	CommonObject	$object		Object we need next value for
 	 *  @return boolean     				false if KO (there is a conflict), true if OK
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated(Object $object): bool
 	{
 		global $conf, $langs, $db;
 

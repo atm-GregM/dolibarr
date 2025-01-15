@@ -124,7 +124,7 @@ abstract class DolibarrTriggers
 	 *
 	 * @return string
 	 */
-	public function getName()
+	public function getName(): string
 	{
 		return $this->name;
 	}
@@ -134,7 +134,7 @@ abstract class DolibarrTriggers
 	 *
 	 * @return string
 	 */
-	public function getDesc()
+	public function getDesc(): string
 	{
 		return $this->description;
 	}
@@ -144,7 +144,7 @@ abstract class DolibarrTriggers
 	 *
 	 * @return string Version of trigger file
 	 */
-	public function getVersion()
+	public function getVersion(): string
 	{
 		global $langs;
 		$langs->load("admin");
@@ -166,7 +166,7 @@ abstract class DolibarrTriggers
 	 * @param	CommonObject	$object		Object
 	 * @return	void
 	 */
-	public function setErrorsFromObject(CommonObject $object)
+	public function setErrorsFromObject(CommonObject $object): void
 	{
 		if (!empty($object->error)) {
 			$this->errors = array_merge($this->errors, array($object->error));
@@ -181,11 +181,11 @@ abstract class DolibarrTriggers
 	 *  All functions "runTrigger" are triggered if file is inside directory htdocs/core/triggers or htdocs/module/code/triggers (and declared)
 	 *
 	 *  @param string       $action     Event action code
-	 *  @param Object       $object     Object
+	 *  @param CommonObject       $object     Object
 	 *  @param User         $user       Object user
 	 *  @param Translate    $langs      Object langs
 	 *  @param conf         $conf       Object conf
 	 *  @return int                     if KO: <0 || if no trigger ran: 0 || if OK: >0
 	 */
-	abstract public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf);
+	abstract public function runTrigger(string $action,CommonObject $object, User $user, Translate $langs, Conf $conf): int;
 }

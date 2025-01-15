@@ -60,7 +60,7 @@ class mod_myobject_standard extends ModeleNumRefMyObject
 	 *  @param      Translate   $langs Translate Object
 	 *  @return     string             Text with description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		return $langs->trans("SimpleNumRefModelDesc", $this->prefix);
 	}
@@ -71,7 +71,7 @@ class mod_myobject_standard extends ModeleNumRefMyObject
 	 *
 	 *  @return     string      Example
 	 */
-	public function getExample()
+	public function getExample(): string
 	{
 		return $this->prefix."0501-0001";
 	}
@@ -84,7 +84,7 @@ class mod_myobject_standard extends ModeleNumRefMyObject
 	 *  @param  CommonObject	$object		Object we need next value for
 	 *  @return bool						false if conflict, true if ok
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated(CommonObject $object): bool
 	{
 		global $conf, $langs, $db;
 
@@ -124,7 +124,7 @@ class mod_myobject_standard extends ModeleNumRefMyObject
 	 *  @param  MyObject		$object		Object we need next value for
 	 *  @return string|int<-1,0>			Next value if OK, <=0 if KO
 	 */
-	public function getNextValue($object)
+	public function getNextValue(MyObject $object)
 	{
 		global $db, $conf;
 

@@ -102,7 +102,7 @@ class mod_barcode_thirdparty_standard extends ModeleNumRefBarCode
 	 * @param	Translate 	$langs		Object langs
 	 * @return  string      			Description of module
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $mc;
 		global $form;

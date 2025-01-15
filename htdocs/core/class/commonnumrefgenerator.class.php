@@ -93,7 +93,7 @@ abstract class CommonNumRefGenerator
 	 *  @deprecated Use getName() instead
 	 *  @see getName()
 	 */
-	public function getNom($langs)
+	public function getNom(Translate $langs): string
 	{
 		return $this->getName($langs);
 	}
@@ -103,7 +103,7 @@ abstract class CommonNumRefGenerator
 	 *  @param	Translate	$langs		Object langs
 	 *  @return string      			Model name
 	 */
-	public function getName($langs)
+	public function getName(Translate $langs): string
 	{
 		return empty($this->name) ? get_class($this) : $this->name;
 	}
@@ -113,7 +113,7 @@ abstract class CommonNumRefGenerator
 	 *
 	 *	@return		boolean     true if module can be used
 	 */
-	public function isEnabled()
+	public function isEnabled(): bool
 	{
 		return true;
 	}
@@ -124,7 +124,7 @@ abstract class CommonNumRefGenerator
 	 *	@param		Translate	$langs		Language
 	 *	@return     string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		return $langs->trans("NoDescription");
 	}
@@ -136,7 +136,7 @@ abstract class CommonNumRefGenerator
 	 *	@param	CommonObject	$object	Object we need next value for
 	 *	@return boolean     			false if conflict, true if ok
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated(CommonObject $object): bool
 	{
 		return true;
 	}
@@ -146,7 +146,7 @@ abstract class CommonNumRefGenerator
 	 *
 	 *	@return     string      Valeur
 	 */
-	public function getVersion()
+	public function getVersion(): string
 	{
 		global $langs;
 		$langs->load("admin");

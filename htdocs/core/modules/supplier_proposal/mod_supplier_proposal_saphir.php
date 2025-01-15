@@ -64,7 +64,7 @@ class mod_supplier_proposal_saphir extends ModeleNumRefSupplierProposal
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $langs, $db;
 

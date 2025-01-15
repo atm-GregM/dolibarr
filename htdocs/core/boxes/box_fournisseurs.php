@@ -61,7 +61,7 @@ class box_fournisseurs extends ModeleBoxes
 	 *  @param	int		$max        Maximum number of records to load
 	 *  @return	void
 	 */
-	public function loadBox($max = 5)
+	public function loadBox(int $max = 5): void
 	{
 		global $user, $langs, $hookmanager;
 		$langs->load("boxes");

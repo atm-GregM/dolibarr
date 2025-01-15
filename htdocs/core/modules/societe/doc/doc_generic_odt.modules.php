@@ -93,7 +93,7 @@ class doc_generic_odt extends ModeleThirdPartyDoc
 	 * @param	Translate	$langs		Object language
 	 * @return	string      			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs;
 

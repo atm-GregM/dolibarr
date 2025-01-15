@@ -59,7 +59,7 @@ class mod_lot_advanced extends ModeleNumRefBatch
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs, $db;
 

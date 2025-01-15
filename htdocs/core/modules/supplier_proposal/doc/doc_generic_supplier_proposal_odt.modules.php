@@ -102,7 +102,7 @@ class doc_generic_supplier_proposal_odt extends ModelePDFSupplierProposal
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *	@return string       			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $langs;
 

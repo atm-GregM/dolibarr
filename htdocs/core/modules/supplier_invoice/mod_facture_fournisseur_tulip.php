@@ -68,7 +68,7 @@ class mod_facture_fournisseur_tulip extends ModeleNumRefSuppliersInvoices
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $langs, $db;
 

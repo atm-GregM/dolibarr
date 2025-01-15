@@ -188,7 +188,7 @@ class ModeleBoxes // Can't be abstract as it is instantiated to build "empty" bo
 	 *  @param	int		$max        Maximum number of records to load
 	 *  @return	void
 	 */
-	public function loadBox($max = 5)
+	public function loadBox(int $max = 5): void
 	{
 		// Must be implemented in derived classes
 		$msg = get_class($this)."::".__FUNCTION__." not implemented";
@@ -253,7 +253,7 @@ class ModeleBoxes // Can't be abstract as it is instantiated to build "empty" bo
 	 * @param	int<0,1>	$nooutput	No print, only return string
 	 * @return  string
 	 */
-	public function showBox($head = null, $contents = null, $nooutput = 0)
+	public function showBox(?array $head = null,?array $contents = null,int $nooutput = 0)
 	{
 		global $langs, $user, $conf;
 

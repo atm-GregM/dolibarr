@@ -67,7 +67,7 @@ class mod_codeclient_monkey extends ModeleThirdPartyCode
 	 *  @param	Translate	$langs	Object langs
 	 *  @return string      		Description of module
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		return $langs->trans("MonkeyNumRefModelDesc", $this->prefixcustomer, $this->prefixsupplier);
 	}

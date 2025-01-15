@@ -60,7 +60,7 @@ class box_ficheinter extends ModeleBoxes
 	 *  @param	int		$max        Maximum number of records to load
 	 *  @return	void
 	 */
-	public function loadBox($max = 10)
+	public function loadBox(int $max = 10): void
 	{
 		global $user, $langs, $conf;
 

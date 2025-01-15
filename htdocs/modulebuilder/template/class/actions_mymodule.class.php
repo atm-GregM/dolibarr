@@ -68,7 +68,7 @@ class ActionsMyModule extends CommonHookActions
 	 *
 	 *  @param	DoliDB	$db      Database handler
 	 */
-	public function __construct($db)
+	public function __construct(DoliDB $db)
 	{
 		$this->db = $db;
 	}
@@ -84,7 +84,7 @@ class ActionsMyModule extends CommonHookActions
 	 *                           				=0 if OK but we want to process standard actions too,
 	 *											>0 if OK and we want to replace standard actions.
 	 */
-	public function getNomUrl($parameters, &$object, &$action)
+	public function getNomUrl(mixed $parameters,CommonObject &$object,string &$action): int
 	{
 		global $db, $langs, $conf, $user;
 		$this->resprints = '';
@@ -100,7 +100,7 @@ class ActionsMyModule extends CommonHookActions
 	 * @param	HookManager			$hookmanager	Hook manager propagated to allow calling another hook
 	 * @return	int									Return integer < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function doActions($parameters, &$object, &$action, $hookmanager)
+	public function doActions(mixed $parameters,CommonObject &$object,?string &$action,HookManager $hookmanager): int
 	{
 		global $conf, $user, $langs;
 
@@ -135,7 +135,7 @@ class ActionsMyModule extends CommonHookActions
 	 * @param	HookManager			$hookmanager	Hook manager propagated to allow calling another hook
 	 * @return	int									Return integer < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function doMassActions($parameters, &$object, &$action, $hookmanager)
+	public function doMassActions(mixed $parameters,CommonObject &$object,?string &$action,HookManager $hookmanager): int
 	{
 		global $conf, $user, $langs;
 
@@ -171,7 +171,7 @@ class ActionsMyModule extends CommonHookActions
 	 * @param	HookManager	$hookmanager			Hook manager propagated to allow calling another hook
 	 * @return	int									Return integer < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function addMoreMassActions($parameters, &$object, &$action, $hookmanager)
+	public function addMoreMassActions(mixed $parameters,CommonObject &$object,?string &$action,HookManager $hookmanager): int
 	{
 		global $conf, $user, $langs;
 
@@ -203,7 +203,7 @@ class ActionsMyModule extends CommonHookActions
 	 *											=0 if OK but we want to process standard actions too,
 	 *											>0 if OK and we want to replace standard actions.
 	 */
-	public function beforePDFCreation($parameters, &$object, &$action)
+	public function beforePDFCreation(mixed $parameters,CommonObject &$object,string &$action): int
 	{
 		global $conf, $user, $langs;
 		global $hookmanager;
@@ -232,7 +232,7 @@ class ActionsMyModule extends CommonHookActions
 	 * 											=0 if OK but we want to process standard actions too,
 	 *											>0 if OK and we want to replace standard actions.
 	 */
-	public function afterPDFCreation($parameters, &$pdfhandler, &$action)
+	public function afterPDFCreation(mixed $parameters,CommonDocGenerator &$pdfhandler,string &$action): int
 	{
 		global $conf, $user, $langs;
 		global $hookmanager;
@@ -262,7 +262,7 @@ class ActionsMyModule extends CommonHookActions
 	 * @param	HookManager			$hookmanager    Hook manager propagated to allow calling another hook
 	 * @return	int									Return integer < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function loadDataForCustomReports($parameters, &$action, $hookmanager)
+	public function loadDataForCustomReports(mixed $parameters,?string &$action,HookManager $hookmanager): int
 	{
 		global $langs;
 
@@ -309,7 +309,7 @@ class ActionsMyModule extends CommonHookActions
 	 *												=0 if OK but we want to process standard actions too,
 	 *												>0 if OK and we want to replace standard actions.
 	 */
-	public function restrictedArea($parameters, &$action, $hookmanager)
+	public function restrictedArea(mixed $parameters, string &$action,HookManager $hookmanager): int
 	{
 		global $user;
 
@@ -337,7 +337,7 @@ class ActionsMyModule extends CommonHookActions
 	 *												=0 if OK but we want to process standard actions too,
 	 *												>0 if OK and we want to replace standard actions.
 	 */
-	public function completeTabsHead(&$parameters, &$object, &$action, $hookmanager)
+	public function completeTabsHead(mixed &$parameters,CommonObject &$object,string &$action,HookManager $hookmanager): int
 	{
 		global $langs, $conf, $user;
 

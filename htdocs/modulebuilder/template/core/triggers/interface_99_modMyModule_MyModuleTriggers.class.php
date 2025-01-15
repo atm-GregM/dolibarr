@@ -44,7 +44,7 @@ class InterfaceMyModuleTriggers extends DolibarrTriggers
 	 *
 	 * @param DoliDB $db Database handler
 	 */
-	public function __construct($db)
+	public function __construct(DoliDB $db)
 	{
 		parent::__construct($db);
 		$this->family = "demo";
@@ -65,7 +65,7 @@ class InterfaceMyModuleTriggers extends DolibarrTriggers
 	 * @param Conf 			$conf 		Object conf
 	 * @return int              		Return integer <0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
+	public function runTrigger(string $action,CommonObject $object, User $user, Translate $langs, Conf $conf): int
 	{
 		if (!isModEnabled('mymodule')) {
 			return 0; // If module is not enabled, we do nothing

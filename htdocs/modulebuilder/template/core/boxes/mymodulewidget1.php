@@ -74,7 +74,7 @@ class mymodulewidget1 extends ModeleBoxes
 	 * @param DoliDB $db Database handler
 	 * @param string $param More parameters
 	 */
-	public function __construct(DoliDB $db, $param = '')
+	public function __construct(DoliDB $db,string $param = '')
 	{
 		global $user;
 
@@ -94,7 +94,7 @@ class mymodulewidget1 extends ModeleBoxes
 	 * @param	int<0,max>	$max	Maximum number of records to load
 	 * @return	void
 	 */
-	public function loadBox($max = 5)
+	public function loadBox(int $max = 5): void
 	{
 		global $langs;
 
@@ -196,7 +196,7 @@ class mymodulewidget1 extends ModeleBoxes
 	 *	@param	int<0,1>	$nooutput	No print, only return string
 	 *	@return	string
 	 */
-	public function showBox($head = null, $contents = null, $nooutput = 0)
+	public function showBox(?array $head = null,?array $contents = null,int $nooutput = 0): string
 	{
 		// You may make your own code here…
 		// … or use the parent's class function using the provided head and contents templates

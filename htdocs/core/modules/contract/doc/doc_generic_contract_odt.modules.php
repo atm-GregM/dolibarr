@@ -101,7 +101,7 @@ class doc_generic_contract_odt extends ModelePDFContract
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *	@return string       			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs;
 

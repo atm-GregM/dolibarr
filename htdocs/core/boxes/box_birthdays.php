@@ -61,7 +61,7 @@ class box_birthdays extends ModeleBoxes
 	 *  @param	int		$max        Maximum number of records to load
 	 *  @return	void
 	 */
-	public function loadBox($max = 20)
+	public function loadBox(int $max = 20): void
 	{
 		global $conf, $user, $langs;
 

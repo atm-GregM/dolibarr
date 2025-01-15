@@ -61,7 +61,7 @@ class box_fediverse extends ModeleBoxes
 	 *  @param	int		$cachedelay		Delay we accept for cache file
 	 *  @return	void
 	 */
-	public function loadBox($max = 5, $cachedelay = 3600)
+	public function loadBox(int $max = 5,int $cachedelay = 3600): void
 	{
 		global $langs;
 

@@ -59,7 +59,7 @@ class mod_myobject_advanced extends ModeleNumRefMyObject
 	 *	@param	Translate	$langs	Translate Object
 	 *	@return	string				Text with description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $db;
 
@@ -98,7 +98,7 @@ class mod_myobject_advanced extends ModeleNumRefMyObject
 	 *
 	 *	@return	string		Example
 	 */
-	public function getExample()
+	public function getExample(): string
 	{
 		global $db, $langs;
 
@@ -127,7 +127,7 @@ class mod_myobject_advanced extends ModeleNumRefMyObject
 	 *  @param  MyObject		$object		Object we need next value for
 	 *  @return string|int<-1,0>			Next value if OK, <=0 if KO
 	 */
-	public function getNextValue($object)
+	public function getNextValue(MyObject $object)
 	{
 		global $db;
 

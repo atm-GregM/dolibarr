@@ -84,7 +84,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 *
 	 *  @param		DoliDB		$db      Database handler
 	 */
-	public function __construct($db)
+	public function __construct(DoliDB $db)
 	{
 		$this->db = $db;
 	}
@@ -94,7 +94,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 *
 	 * @return     string      Return translation of module label. Try translation of $this->name then translation of 'MailingModuleDesc'.$this->name, or $this->desc if not found
 	 */
-	public function getDesc()
+	public function getDesc(): string
 	{
 		global $langs, $form;
 
@@ -121,7 +121,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 *
 	 *  @return     integer      Example
 	 */
-	public function getNbOfRecords()
+	public function getNbOfRecords(): int
 	{
 		return 0;
 	}
@@ -132,7 +132,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 * @param      string		$sql        Sql request to count
 	 * @return     int|string      			Nb of recipient, or <0 if error, or '' if NA
 	 */
-	public function getNbOfRecipients($sql)
+	public function getNbOfRecipients(string $sql)
 	{
 		$result = $this->db->query($sql);
 		if ($result) {
@@ -153,7 +153,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 *
 	 * @return     string      Retourne zone select
 	 */
-	public function formFilter()
+	public function formFilter(): string
 	{
 		return '';
 	}
@@ -165,7 +165,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 * @param	int		$mailing_id          Id of emailing
 	 * @return  int			                 Return integer < 0 si erreur, nb destinataires si ok
 	 */
-	public function update_nb($mailing_id)
+	public function update_nb(int $mailing_id): int
 	{
 		// phpcs:enable
 		// Mise a jour nombre de destinataire dans table des mailings
@@ -196,7 +196,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 * @param	array<array{fk_contact?:int,lastname:string,firstname:string,email:string,other:string,source_url:string,source_id?:int,source_type:string,id?:int}>		$cibles		Array with targets
 	 * @return  int      			   Return integer < 0 if error, nb added if OK
 	 */
-	public function addTargetsToDatabase($mailing_id, $cibles)
+	public function addTargetsToDatabase(int $mailing_id,array $cibles): int
 	{
 		global $conf;
 
@@ -288,7 +288,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 *  @param  int		$mailing_id        Id of emailing
 	 *  @return	void
 	 */
-	public function clear_target($mailing_id)
+	public function clear_target(int $mailing_id): void
 	{
 		// phpcs:enable
 		$sql = "DELETE FROM ".MAIN_DB_PREFIX."mailing_cibles";
@@ -309,7 +309,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 *  @param	?array<string>	$forcedir	null=All default directories. This parameter is used by modulebuilder module only.
 	 *  @return array<array{picto:string,file:string,fullpath:string,relpath:string,iscoreorexternal:'external'|'internal',version:string,status:string,info:string}>	Array list of widgets
 	 */
-	public static function getEmailingSelectorsList($forcedir = null)
+	public static function getEmailingSelectorsList(?array $forcedir = null): array
 	{
 		global $langs, $db;
 
@@ -442,7 +442,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 *
 	 *	@return		string[]		Array with SQL requests
 	 */
-	public function getSqlArrayForStats()
+	public function getSqlArrayForStats(): array
 	{
 		// Needs to be implemented in child class
 		$msg = get_class($this)."::".__FUNCTION__." not implemented";
@@ -457,7 +457,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	 *  @param  int     $mailing_id     Id of emailing
 	 *  @return int                     Return integer < 0 on error, count of added when ok
 	 */
-	public function add_to_target($mailing_id)
+	public function add_to_target(int $mailing_id): int
 	{
 		// phpcs:enable
 		// Needs to be implemented in child class

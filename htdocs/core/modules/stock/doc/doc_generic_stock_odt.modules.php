@@ -100,7 +100,7 @@ class doc_generic_stock_odt extends ModelePDFStock
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *	@return string       			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs;
 

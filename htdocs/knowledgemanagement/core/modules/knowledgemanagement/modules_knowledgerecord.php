@@ -133,7 +133,7 @@ abstract class ModeleNumRefKnowledgeRecord
 	 *	@param	Object		$object		Object we need next value for
 	 *	@return boolean     			false if conflict, true if ok
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated(Object $object): bool
 	{
 		return true;
 	}

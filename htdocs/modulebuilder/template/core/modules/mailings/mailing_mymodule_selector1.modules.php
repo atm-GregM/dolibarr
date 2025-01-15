@@ -52,7 +52,7 @@ class mailing_mailing_mymodule_selector1 extends MailingTargets
 	 *
 	 *	@param	DoliDB	$db		Database handler
 	 */
-	public function __construct($db)
+	public function __construct(DoliDB $db)
 	{
 		$this->db = $db;
 		//$this->enabled = ...
@@ -64,7 +64,7 @@ class mailing_mailing_mymodule_selector1 extends MailingTargets
 	 *
 	 *	@return	string		Return select zone
 	 */
-	public function formFilter()
+	public function formFilter(): string
 	{
 		global $langs;
 		$langs->load("members");
@@ -91,7 +91,7 @@ class mailing_mailing_mymodule_selector1 extends MailingTargets
 	 *	@param	int		$id		ID
 	 *	@return	string			Url link
 	 */
-	public function url($id)
+	public function url(int $id): string
 	{
 		return '<a href="'.dol_buildpath('/mymodule/myobject_card.php', 1).'?id='.$id.'">'.img_object('', "generic").'</a>';
 	}
@@ -104,7 +104,7 @@ class mailing_mailing_mymodule_selector1 extends MailingTargets
 	 *	@param	int			$mailing_id     Id of emailing
 	 *	@return	int<-1,max>					Return integer <0 if error, number of emails added if ok
 	 */
-	public function add_to_target($mailing_id)
+	public function add_to_target(int $mailing_id): int
 	{
 		// phpcs:enable
 		$target = array();
@@ -173,7 +173,7 @@ class mailing_mailing_mymodule_selector1 extends MailingTargets
 	 *
 	 *	@return		string[]		Array with SQL requests
 	 */
-	public function getSqlArrayForStats()
+	public function getSqlArrayForStats(): array
 	{
 		// CHANGE THIS: Optional
 
@@ -192,7 +192,7 @@ class mailing_mailing_mymodule_selector1 extends MailingTargets
 	 *	@param	string			$sql	Not used here
 	 *	@return	int<-1,max>				Nb of recipients or -1 if KO
 	 */
-	public function getNbOfRecipients($sql = '')
+	public function getNbOfRecipients(string $sql = ''): int
 	{
 		$sql = "SELECT COUNT(DISTINCT(email)) as nb";
 		$sql .= " FROM ".MAIN_DB_PREFIX."myobject as p";

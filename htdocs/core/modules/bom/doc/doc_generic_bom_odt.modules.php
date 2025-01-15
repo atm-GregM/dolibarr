@@ -96,7 +96,7 @@ class doc_generic_bom_odt extends ModelePDFBom
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *	@return string       			Description
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $conf, $langs;
 

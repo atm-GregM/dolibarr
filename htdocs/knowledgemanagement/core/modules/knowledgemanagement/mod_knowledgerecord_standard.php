@@ -83,7 +83,7 @@ class mod_knowledgerecord_standard extends ModeleNumRefKnowledgeRecord
 	 *  @param  Object		$object		Object we need next value for
 	 *  @return boolean     			false if conflict, true if ok
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated(Object $object): bool
 	{
 		global $conf, $langs, $db;
 

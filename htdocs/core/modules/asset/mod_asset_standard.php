@@ -60,7 +60,7 @@ class mod_asset_standard extends ModeleNumRefAsset
 	 *	@param	Translate	$langs      Lang object to use for output
 	 *  @return string      			Descriptive text
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
 		global $langs;
 		return $langs->trans("SimpleNumRefModelDesc", $this->prefix);
@@ -85,7 +85,7 @@ class mod_asset_standard extends ModeleNumRefAsset
 	 *  @param  CommonObject	$object		Object we need next value for
 	 *  @return boolean     				false if conflict, true if ok
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated(Object $object): bool
 	{
 		global $conf, $langs, $db;
 
