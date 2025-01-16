@@ -1577,7 +1577,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 								$sql .= "'".$this->db->escape($priority)."', ";
 							}
 							if (!empty($datenextrun)) {
-								$sql .= "'".$this->db->escape($datenextrun)."', ";
+								$sql .= "'".$this->db->idate($datenextrun)."', ";
 							}
 							if (is_int($status)) {
 								$sql .= ((int) $status).", ";
